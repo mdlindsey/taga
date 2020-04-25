@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card from '../src/components/Card';
+import Card, { HandWrapper } from '../src/components/Card';
 
 export default {
   title: 'Card',
@@ -32,13 +32,25 @@ HoverProp.story = {
 };
 
 const CardWrapper = styled.span`
-  img {
+  .card img {
     max-width: 150px;
     max-height: 217px;
   }
 `;
+
 export const StyledCard = () => <CardWrapper><Card suit="S" face="A" /></CardWrapper>;
 
 StyledCard.story = {
   name: 'With Custom Styling',
+};
+
+export const HandOfCards = () => (
+  <HandWrapper>
+    <Card suit="S" face="A" />
+    <Card suit="S" face="K" />
+  </HandWrapper>
+);
+
+HandOfCards.story = {
+  name: 'Hand of Cards',
 };

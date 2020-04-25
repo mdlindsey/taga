@@ -8,7 +8,7 @@ import styled from 'styled-components';
 export default ({ suit, face, onClick=()=>{}, onMouseOver=()=>{}}) => {
     const cardImg = validSuit(suit) && validFace(face) ? String(suit + face).toUpperCase() : 'BACK';
     return (
-        <CardWrapper onClick={e => onClick(e,{suit,face})} onMouseOver={e => onMouseOver(e,{suit,face})} className="--Card">
+        <CardWrapper onClick={e => onClick(e,{suit,face})} onMouseOver={e => onMouseOver(e,{suit,face})} className="card">
             <img src={ require(`./assets/cards/${cardImg}.png`) } alt={`${face}${suit}`} />
         </CardWrapper>
     );
@@ -49,9 +49,22 @@ const validFace = (face) => {
             return false;
     }
 };
+// Wrap the cards with the max dimensions of the smallest image (back.png)
 const CardWrapper = styled.span`
     img {
         max-width: 427px;
         max-height: 600px;
+    }
+`;
+
+export const HandWrapper = styled.div`
+    .card { 
+        img {
+            max-width: 427px;
+            max-height: 600px;
+        }
+    }
+    ${
+        props => console.log(props)
     }
 `;
