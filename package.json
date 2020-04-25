@@ -1,0 +1,72 @@
+{
+  "name": "deckd",
+  "version": "0.0.1",
+  "description": "Library for all things related to card games including game engines, bots, React components, and more",
+  "main": "dist/deckd.min.js",
+  "scripts": {
+    "storybook": "start-storybook -p 6006",
+    "build": "rollup -c -o dist/deckd.min.js",
+    "build-storybook": "build-storybook",
+    "test": "jest",
+    "test:update": "jest --updateSnapshot"
+  },
+  "jest": {
+    "verbose": true,
+    "moduleNameMapper": {
+      ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
+      ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdlindsey/deckd.git"
+  },
+  "keywords": [
+    "poker",
+    "blackjack",
+    "spades",
+    "hearts",
+    "casino",
+    "cards",
+    "chips",
+    "react"
+  ],
+  "author": {
+    "name": "Dan Lindsey",
+    "email": "dev@mdlindsey.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mdlindsey/deckd/issues"
+  },
+  "homepage": "https://github.com/mdlindsey/deckd#readme",
+  "peerDependencies": {
+    "react": "^16.8.6"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "@storybook/addon-actions": "^5.3.18",
+    "@storybook/addon-links": "^5.3.18",
+    "@storybook/addons": "^5.3.18",
+    "@storybook/react": "^5.3.18",
+    "babel-jest": "^24.7.1",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-transform-css-import-to-string": "0.0.2",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24.7.1",
+    "postcss-twist-url-assets": "^1.0.0",
+    "react-test-renderer": "^16.8.6",
+    "rollup": "^1.10.1",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-copy": "^2.0.0",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-terser": "^5.3.0"
+  },
+  "dependencies": {
+    "react": "^16.8.6",
+    "styled-components": "^5.1.0"
+  }
+}

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card will render 1`] = `
+<span
+  className="playing-card"
+  onClick={[Function]}
+  onMouseOver={[Function]}
+>
+  <img
+    alt="AS"
+    src={
+      Object {
+        "process": [Function],
+      }
+    }
+    style={
+      Object {
+        "height": 217,
+        "width": 150,
+      }
+    }
+  />
+</span>
+`;
