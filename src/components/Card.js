@@ -4,8 +4,9 @@ import styled, { css } from 'styled-components';
     <Card />
     suit - letter of suit (eg: S)
     face - letter of face (eg: A, K, Q, 10=T)
+    disabled - if truthy will dim the card and prevent uplift on hover for HandWrapper
 */
-export default ({ suit, face, disabled, onClick=()=>{}, onMouseOver=()=>{}}) => {
+export default ({ suit, face, disabled, onClick=()=>{}, onMouseOver=()=>{} }) => {
     const cardImg = validSuit(suit) && validFace(face) ? String(suit + face).toUpperCase() : 'BACK';
     return (
         <CardWrapper
