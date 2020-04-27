@@ -111,10 +111,10 @@ export const HandWrapper = styled.div`
         props => {
             let styles = '';
             const offsetLeft = 2;
-            const middle = props.children.length / 2;
+            const middle = (props.children.length - 1) / 2;
             for(let i = 0; i < props.children.length; i++) {
                 // middle cards should be highest so get the min distance from either end for offset
-                const style = `translate(${Math.abs(i - middle) * 0.25}rem, ${Math.abs(i - middle) * 0.15}rem) rotate(${(i - middle) * 3}deg)`;
+                const style = `translate(${(i - middle) * 0.25}rem, ${Math.abs(i - middle) * 0.15}rem) rotate(${(i - middle) * 3}deg)`;
                 styles += `.card:nth-of-type(${i+1}) {
                     left: ${i * offsetLeft}rem;
                     -moz-transform: ${style};

@@ -1,9 +1,47 @@
 import React from 'react';
+import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/Card';
 
 export default {
-  title: 'Hands',
+  title: 'Cards',
   component: Card,
+};
+
+export const AllCards = () => (
+  <CardWrapper>
+    <Card />
+    {
+      ['S', 'H', 'C', 'D'].map(
+        suit => ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'].map(
+          face => <Card suit={suit} face={face} />
+        )
+      )
+    }
+  </CardWrapper>
+);
+
+AllCards.story = {
+  name: 'All Cards',
+};
+
+const onEvent = (e, { suit,face }) => alert(suit+face);
+export const EventProps = () => <Card suit="S" face="A" onClick={onEvent} onMouseOver={onEvent} />;
+
+EventProps.story = {
+  name: 'Event Props',
+};
+
+
+const CardWrapper = styled.span`
+  .card img {
+    max-width: 150px;
+    max-height: 217px;
+  }
+`;
+export const StyledCard = () => <CardWrapper><Card suit="S" face="A" /></CardWrapper>;
+
+StyledCard.story = {
+  name: 'Custom Styling',
 };
 
 export const DisabledCards = () => (
@@ -24,7 +62,7 @@ DisabledCards.story = {
 };
 
 
-export const Hands = () => (
+export const DynamicHands = () => (
   <>
       <HandWrapper>
         <Card suit="S" face="A" />
@@ -93,6 +131,6 @@ export const Hands = () => (
   </>
 );
 
-Hands.story = {
-  name: 'Grouped Hands',
+DynamicHands.story = {
+  name: 'Dynamic Hands',
 };
