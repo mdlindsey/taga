@@ -4,8 +4,8 @@ export interface GameModel {
     readonly round: RoundModel
     readonly state: ActionState
     readonly score: ScoreModel
-    normalize(): void // Formats current round for reduce() and bots
-    reduce(): void // Reduces ActionState from current round model
+    normalize(): void // Populates this.round
+    reduce(): void // Populates this.state
     interact(action: ActionInput): GameModel
 }
 // ActionState dictates next move expectations
