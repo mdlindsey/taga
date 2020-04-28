@@ -19,6 +19,7 @@ import {
     MOD_NA,
     REQ_CARDS_PER_SUIT,
 } from './config';
+import { sortCardsByRank, cardSuit } from './util';
 export class GameInstance implements GameModel {
     public data:RoundData[];
     public round:RoundModel;
@@ -117,15 +118,20 @@ export class GameInstance implements GameModel {
             this.state = { actionId: ACTION_PLAY, playerIndex: highestBidderIndex, actionModifier: MOD_NA };
             return;
         }
-        if (this.round.plays.length % totalActivePlayers === 0) {
-            // trick taker's turn to play any suit
-            this.state = { actionId: ACTION_PLAY, playerIndex: highestBidderIndex, actionModifier: MOD_NA };
+        // Determine where the last trick started
+        const trickStartingIndex = this.round.plays.length < totalActivePlayers 
+            ? 0 : this.round.plays.length - (this.round.plays.length % totalActivePlayers);
+        const trick = this.round.plays.slice(trickStartingIndex, this.round.plays.length-1);
+        if (this.round.plays.length % totalActivePlayers !== 0) {
+            // next player's turn to follow suit (if applicable)
+            const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % totalActivePlayers;
+            this.state = { actionId: ACTION_PLAY, playerIndex: nextPlayerIndex, actionModifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
-
-
-        // Determine where the last trick started
-        const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
-        return;
+        // Trick taker's turn to play any suit
+        const rankedTrick = trick.sort((c1, c2) => sortCardsByRank(c1, c2, this.round.trump));
+        const highestCardIndex = trick.indexOf(rankedTrick[0]);
+        const trickTakerIndex = ( highestBidderIndex + highestCardIndex) % totalActivePlayers;
+        this.state = { actionId: ACTION_PLAY, playerIndex: trickTakerIndex, actionModifier: MOD_NA };
     }
 }

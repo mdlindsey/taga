@@ -18,6 +18,7 @@ export const MOD_NA = -1
 export const PLAYER_NA = -1
 
 // SUITS
+// Suit order does not matter but cards must go from high to low (eg: A=0,9=5) for util.sortCardsByRank()
 export const SUIT_S = 0
 export const SUIT_H = 1
 export const SUIT_C = 2
