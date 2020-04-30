@@ -1,5 +1,3 @@
-import { FORMERR } from "dns"
-
 // GAME REQUIREMENTS
 export const MIN_BID = 3
 export const MAX_BID = 6
@@ -78,3 +76,5 @@ for(const suitIdStr in suitMap) {
         cardMap[suitId * REQ_CARDS_PER_SUIT + faceId] = suitMap[suitId] + faceMap[faceId];
     }
 }
+
+export const actionMap = { '-1': 'deal', '0': 'bid', '1': 'trump', '2': 'swap', '3': 'play' };

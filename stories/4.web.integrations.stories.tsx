@@ -3,16 +3,22 @@ import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/web/Card';
 import { hands } from '../__mocks__/pepper';
 import Pepper from '../src/games/pepper';
-import { RoundData, ActionInput } from '../src/games/pepper/@types';
-import { actionName, suitName, cardName } from '../src/games/pepper/translate';
-import { cardMap, ACTION_TRUMP, ACTION_BID, ACTION_PLAY } from '../src/games/pepper/config';
 
 export default {
   title: 'Web.Integrations',
   component: Card,
 };
 
-const roundData:RoundData[] = [
+const { Config: {
+  cardMap,
+  suitMap,
+  actionMap,
+  ACTION_BID,
+  ACTION_TRUMP,
+  ACTION_PLAY,
+} } = Pepper;
+
+const roundData = [
   {
     actions: [],
     hands: hands.pepper
@@ -107,13 +113,13 @@ const TableWrapper = styled.div`
 `;
 
 export const PepperTable = () => {
-  const [game, setGame] = useState(Pepper(roundData));
+  const [game, setGame] = useState(new Pepper.GameInstance(roundData));
   const [moves, setMoves] = useState([]);
   const nextMove = () => {
     try {
       const nextAction = { id: game.state.id, player: game.state.player, payload: game.bot() };
       game.interact(nextAction);
-      setGame(Pepper(game.data));
+      setGame(new Pepper.GameInstance(game.data));
       setMoves([...moves, nextAction]);
     } catch(e) {
       alert(e);
@@ -124,17 +130,17 @@ export const PepperTable = () => {
       <FeedWrapper>
         <ul>
           {
-            moves.map((action:ActionInput, i:number) => (
+            moves.map((action, i:number) => (
               <li key={i}>
-                Player #{action.player+1} {actionName(action.id)}s&nbsp;
+                Player #{action.player+1} {actionMap[action.id]}s&nbsp;
                 {
                   action.id === ACTION_BID && `${action.payload}`
                 }
                 {
-                  action.id === ACTION_TRUMP && suitName(action.payload)
+                  action.id === ACTION_TRUMP && suitMap[action.payload]
                 }
                 {
-                  action.id != ACTION_BID && action.id !== ACTION_TRUMP && cardName(action.payload)
+                  action.id != ACTION_BID && action.id !== ACTION_TRUMP && cardMap[action.payload]
                 }
               </li>
             ))

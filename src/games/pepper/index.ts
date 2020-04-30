@@ -1,7 +1,9 @@
-import { act } from './bot';
-import { RoundData } from './@types';
+import * as Types from './@types';
+import * as Config from './config';
 import { GameInstance } from './game';
 
-export default (roundData:RoundData[]) => {
-    return new GameInstance(roundData);
+export default {
+    ...Types,
+    Config,
+    GameInstance
 };
