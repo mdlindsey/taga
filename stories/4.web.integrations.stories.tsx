@@ -1,11 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card, { HandWrapper } from '../src/components/Card';
+import Card, { HandWrapper } from '../src/components/web/Card';
+import { hands } from '../__mocks__/pepper';
+import Pepper from '../src/games/pepper';
 
 export default {
-  title: 'Integrations',
+  title: 'Web.Integrations',
   component: {},
 };
+
+const roundData = [
+  {
+    actions: [],
+    hands: [
+      []
+    ]
+  }
+];
+const pepper = Pepper(roundData);
 
 const BottomCenterWrapper = styled.div`
   position: fixed;

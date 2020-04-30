@@ -7,19 +7,17 @@ import {
     SUIT_H,
     SUIT_C,
     SUIT_D,
+    MAX_BID,
+    REQ_PLAYERS,
     REQ_CARDS_PER_SUIT,
 } from './config';
 export const cardSuit = (card:number, trump:number):number => {
     if (isBowerTrump(card,trump)) {
         switch(card) {
-            case SJ:
-                return SUIT_C;
-            case HJ:
-                return SUIT_D;
-            case CJ:
-                return SUIT_S;
-            case DJ:
-                return SUIT_H;
+            case SJ: return SUIT_C;
+            case HJ: return SUIT_D;
+            case CJ: return SUIT_S;
+            case DJ: return SUIT_H;
         }
     }
     return Math.floor(card / REQ_CARDS_PER_SUIT);
@@ -74,4 +72,17 @@ export const sortCardsByRank = (c1:number, c2:number, trump:number):number => { 
     }
     // both are trump and neither are Jacks so it's numerical comparison
     return c1 < c2 ? -1 : 1;
+};
+export const canFollowSuit = (suitToFollow:number, hand:number[], plays:number[], trump:number):boolean => {
+    for(const card of hand) {
+        if (!plays.includes(card) && cardSuit(card, trump) === suitToFollow) {
+            return true;
+        }
+    }
+    return false;
+};
+export const activeTrick = (bids:number[], plays:number[]):number[] => {
+    const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
+    const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
+    return plays.slice(trickStartingIndex, plays.length-1);
 };

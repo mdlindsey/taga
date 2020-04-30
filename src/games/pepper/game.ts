@@ -7,19 +7,26 @@ import {
     ScoreModel,
 } from './@types';
 import {
+    MOD_NA,
     MAX_BID,
+    MIN_BID,
+    PLAYER_NA,
     ACTION_BID,
     ACTION_TRUMP,
     ACTION_SWAP,
     ACTION_PLAY,
     ACTION_DEAL,
+    SWAP_REFUSE,
     REQ_PLAYERS,
-    REQ_CARDS_PER_PLAYER,
-    PLAYER_NA,
-    MOD_NA,
     REQ_CARDS_PER_SUIT,
+    REQ_CARDS_PER_PLAYER,
 } from './config';
-import { sortCardsByRank, cardSuit } from './util';
+import {
+    sortCardsByRank,
+    cardSuit,
+    canFollowSuit,
+    activeTrick
+} from './util';
 export class GameInstance implements GameModel {
     public data:RoundData[];
     public round:RoundModel;
@@ -27,30 +34,87 @@ export class GameInstance implements GameModel {
     public score:ScoreModel;
     constructor(rounds) {
         this.data = rounds;
-        this.normalize();
-        this.reduce();
+        this.normalizeRound();
+        this.reduceExpectedState();
     }
-    interact(action: ActionInput) {
+    interact(action:ActionInput) {
+        if (action.id !== this.state.id) {
+            throw new Error(`unexpected action[${action.id}]; expecting action[${this.state.id}]`);
+        }
+        if (action.player !== this.state.player) {
+            throw new Error(`unexpected player[${action.player}]; expecting player[${this.state.player}]`);
+        }
+        if (action.id === ACTION_BID) {
+            // validate bid
+            if (action.payload > MAX_BID) {
+                throw new Error(`bid (${action.payload}) exceeds max (${MAX_BID})`);
+            }
+            const highestBid = Math.max(...this.round.bids);
+            if (action.payload <= highestBid && action.payload >= MIN_BID) {
+                throw new Error(`must pass (bid 0) or bid more than ${highestBid}`);
+            }
+        }
+        if (action.id === ACTION_TRUMP) {
+            // Ensure -1 <= trump =< 3
+            if (action.payload < -1 || action.payload > 3) {
+                throw new Error(`invalid trump suit (${action.payload}); expecting range -1:3`);
+            }
+        }
+        if (action.id === ACTION_SWAP) {
+            // validate a swap
+            if (this.round.swaps.length) { // partner swapping
+                // ensure the partner isn't refusing
+                if (action.payload === SWAP_REFUSE) {
+                    throw new Error('partner cannot refuse to swap');
+                }
+            }
+        }
+        if (action.id === ACTION_PLAY || (action.id === ACTION_SWAP && action.payload !== SWAP_REFUSE)) {
+            // ensure they own the card they're swapping
+            if (!this.round.hands[action.player].includes(action.payload)) {
+                throw new Error('invalid card; must play from hand');
+            }
+            // ensure they're following suit if applicable
+            const inputSuit = cardSuit(action.payload, this.round.trump);
+            const mustFollowSuit = canFollowSuit(this.state.modifier, this.round.hands[action.player], this.round.plays, this.round.trump);
+            if (inputSuit !== this.state.modifier && mustFollowSuit) {
+                throw new Error(`must follow suit (${this.state.modifier})`);
+            }
+            // ensure card isn't already played
+            if (this.round.plays.includes(action.payload)) {
+                throw new Error('invalid card; already played');
+            }
+        }
+        // If no errors were thrown try applying the changes and comparing state to prev
+        const oldState = {...this.state};
+        this.data[this.data.length-1].actions.push({ id: action.id, payload: action.payload });
+        // normalize and reduce state again
+        this.normalizeRound();
+        this.reduceExpectedState();
+        if (oldState.id === this.state.id && oldState.player === this.state.player) {
+            throw new Error('stale state; please report');
+        }
+        // If everything looks good return the updated game state
         return this;
     }
-    normalize() {
+    normalizeRound() {
         // Separate actions into bids, trump, swaps, and plays 
         let trump = -2; // -2: unset, -1: no trump, 0-3: suit index trump
         const round = this.data[this.data.length - 1];
         const bids:number[] = [], swaps:number[] = [], plays:number[] = [];
         for(const action of round.actions) {
-            switch(action.actionId) {
+            switch(action.id) {
                 case ACTION_BID:
-                    bids.push(action.actionPayload);
+                    bids.push(action.payload);
                     break;
                 case ACTION_TRUMP:
-                    trump = action.actionPayload;
+                    trump = action.payload;
                     break;
                 case ACTION_SWAP:
-                    swaps.push(action.actionPayload);
+                    swaps.push(action.payload);
                     break;
                 case ACTION_PLAY:
-                    plays.push(action.actionPayload);
+                    plays.push(action.payload);
                     break;
             }
         }
@@ -75,30 +139,30 @@ export class GameInstance implements GameModel {
             hands,
         };
     }
-    reduce() {
+    reduceExpectedState() {
         // Determine if a player is sitting out due to a partner peppering
         const highestBid = Math.max(...this.round.bids);
         const totalActivePlayers = highestBid !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
         if (this.round.plays.length === totalActivePlayers * REQ_CARDS_PER_PLAYER) {
             // All cards are played, start a new round
-            this.state = { actionId: ACTION_DEAL, playerIndex: PLAYER_NA, actionModifier: MOD_NA };
+            this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };
             return;
         }
         const firstBidderIndex = (this.data.length - 1) % REQ_PLAYERS;
         if (!this.round.bids.length) {
             // It's the first player's turn to bid
-            this.state = { actionId: ACTION_BID, playerIndex: firstBidderIndex, actionModifier: MOD_NA };
+            this.state = { id: ACTION_BID, player: firstBidderIndex, modifier: MOD_NA };
             return;
         }
         const highestBidderIndex = firstBidderIndex + this.round.bids.indexOf(highestBid)
         if (this.round.trump === -2) {
             if (totalActivePlayers !== REQ_PLAYERS || this.round.bids.length === REQ_PLAYERS) {
                 // Someone has peppered or everyone has bid, it's the highest bidder's turn to choose trump
-                this.state = { actionId: ACTION_TRUMP, playerIndex: highestBidderIndex, actionModifier: MOD_NA };
+                this.state = { id: ACTION_TRUMP, player: highestBidderIndex, modifier: MOD_NA };
                 return;
             }
             // Otherwise it's the next player's turn to bid
-            this.state = { actionId: ACTION_BID, playerIndex: firstBidderIndex + this.round.bids.length, actionModifier: highestBid };
+            this.state = { id: ACTION_BID, player: firstBidderIndex + this.round.bids.length, modifier: highestBid };
             return;
         }
         // Determine if we need to swap
@@ -106,32 +170,29 @@ export class GameInstance implements GameModel {
         if (highestBid === MAX_BID && this.round.swaps.length < 2 && this.round.swaps[0] !== -1) {
             // We have a pepper bid with outstanding swaps (less than 2 and not rejected)
             if (!this.round.swaps.length) { // No swaps yet, offer to highest bidder
-                this.state = { actionId: ACTION_SWAP, playerIndex: highestBidderIndex, actionModifier: MOD_NA };
+                this.state = { id: ACTION_SWAP, player: highestBidderIndex, modifier: MOD_NA };
                 return;
             }
             const desiredSuit = this.round.trump < 0 ? MOD_NA : Math.floor(this.round.swaps[0] / REQ_CARDS_PER_SUIT);
-            this.state = { actionId: ACTION_SWAP, playerIndex: highestBidderPartnerIndex, actionModifier: desiredSuit };
+            this.state = { id: ACTION_SWAP, player: highestBidderPartnerIndex, modifier: desiredSuit };
             return;
         }
         if (!this.round.plays.length) {
             // highest bidder's turn to play any suit
-            this.state = { actionId: ACTION_PLAY, playerIndex: highestBidderIndex, actionModifier: MOD_NA };
+            this.state = { id: ACTION_PLAY, player: highestBidderIndex, modifier: MOD_NA };
             return;
         }
-        // Determine where the last trick started
-        const trickStartingIndex = this.round.plays.length < totalActivePlayers 
-            ? 0 : this.round.plays.length - (this.round.plays.length % totalActivePlayers);
-        const trick = this.round.plays.slice(trickStartingIndex, this.round.plays.length-1);
+        const trick = activeTrick(this.round.bids, this.round.plays);
         if (this.round.plays.length % totalActivePlayers !== 0) {
             // next player's turn to follow suit (if applicable)
             const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % totalActivePlayers;
-            this.state = { actionId: ACTION_PLAY, playerIndex: nextPlayerIndex, actionModifier: cardSuit(trick[0], this.round.trump) };
+            this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
         // Trick taker's turn to play any suit
         const rankedTrick = trick.sort((c1, c2) => sortCardsByRank(c1, c2, this.round.trump));
         const highestCardIndex = trick.indexOf(rankedTrick[0]);
         const trickTakerIndex = ( highestBidderIndex + highestCardIndex) % totalActivePlayers;
-        this.state = { actionId: ACTION_PLAY, playerIndex: trickTakerIndex, actionModifier: MOD_NA };
+        this.state = { id: ACTION_PLAY, player: trickTakerIndex, modifier: MOD_NA };
     }
 }

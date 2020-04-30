@@ -33,6 +33,9 @@ export const TRUMP_HEARTS = SUIT_H
 export const TRUMP_CLUBS = SUIT_C
 export const TRUMP_DIAMONDS = SUIT_D
 
+// SWAPS
+export const SWAP_REFUSE = -1
+
 // CARDS
 export const SA = 0
 export const SK = 1

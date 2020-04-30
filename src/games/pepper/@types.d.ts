@@ -4,21 +4,21 @@ export interface GameModel {
     readonly round: RoundModel
     readonly state: ActionState
     readonly score: ScoreModel
-    normalize(): void // Populates this.round
-    reduce(): void // Populates this.state
-    interact(action: ActionInput): GameModel
+    interact(action: ActionInput): GameModel // Exposed publicly
+    normalizeRound(): void // Populates this.round
+    reduceExpectedState(): void // Populates this.state
 }
 // ActionState dictates next move expectations
 export interface ActionState {
-    actionId: number
-    playerIndex: number
-    actionModifier: number // eg: on action PLAY modifier is suitId
+    id: number
+    player: number
+    modifier: number // eg: on action PLAY modifier is suitId
 }
 // ActionInput is input by user for next move
 export interface ActionInput {
-    actionId: number
-    playerIndex: number
-    actionPayload: number // eg: card being played
+    id: number
+    player: number
+    payload: number // eg: card being played
 }
 // Raw data (from db)
 export interface RoundData {
@@ -26,8 +26,8 @@ export interface RoundData {
     actions: ActionData[]
 }
 export interface ActionData {
-    actionId: number
-    actionPayload: number
+    id: number
+    payload: number
 }
 // Modeling
 export type Hand = number[];

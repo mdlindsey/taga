@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card, { HandWrapper } from '../src/components/Card';
+import Card, { HandWrapper } from '../src/components/web/Card';
 
 export default {
-  title: 'Cards',
+  title: 'Web.Cards',
   component: Card,
 };
 
