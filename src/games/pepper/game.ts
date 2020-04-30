@@ -7,6 +7,7 @@ import {
     ScoreModel,
 } from './@types';
 import {
+    cardMap,
     MOD_NA,
     MAX_BID,
     MIN_BID,
@@ -77,7 +78,7 @@ export class GameInstance implements GameModel {
         if (action.id === ACTION_PLAY || (action.id === ACTION_SWAP && action.payload !== SWAP_REFUSE)) {
             // ensure they own the card they're swapping
             if (!this.round.hands[action.player].includes(action.payload)) {
-                throw new Error('invalid card; must play from hand');
+                throw new Error(`invalid card ${cardMap[action.payload]}(${action.payload}); must play from hand`);
             }
             // ensure they're following suit if applicable
             const inputSuit = cardSuit(action.payload, this.round.trump);

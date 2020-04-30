@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/web/Card';
 import { hands } from '../__mocks__/pepper';
 import Pepper from '../src/games/pepper';
-import { RoundData } from '../src/games/pepper/@types';
+import { RoundData, ActionInput } from '../src/games/pepper/@types';
+import { actionName, suitName, cardName } from '../src/games/pepper/translate';
+import { cardMap, ACTION_TRUMP, ACTION_BID, ACTION_PLAY } from '../src/games/pepper/config';
 
 export default {
   title: 'Web.Integrations',
@@ -17,11 +19,49 @@ const roundData:RoundData[] = [
   }
 ];
 
-const BottomCenterWrapper = styled.div`
+const BottomHandWrapper = styled.div`
   position: fixed;
   bottom: -6rem;
   width: 100%;
   text-align: center;
+`;
+
+const LeftHandWrapper = styled.div`
+  position: fixed;
+  top: calc(50% - 12rem);
+  left: calc(-50% + 3rem);
+  width: 100%;
+  text-align: center;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+`;
+
+const RightHandWrapper = styled.div`
+  position: fixed;
+  top: calc(50% - 12rem);
+  right: calc(-50% + 3rem);
+  width: 100%;
+  text-align: center;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+`;
+
+const TopHandWrapper = styled.div`
+  position: fixed;
+  top: -6rem;
+  width: 100%;
+  text-align: center;
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
 `;
 
 const CenterWrapper = styled.div`
@@ -30,6 +70,14 @@ const CenterWrapper = styled.div`
   bottom: 50%;
   width: 100%;
   text-align: center;
+`;
+
+const FeedWrapper = styled.div`
+  position: fixed;
+  z-index: 99999;
+  top: 5%;
+  left: 0;
+  width: 350px;
 `;
 
 const TableWrapper = styled.div`
@@ -60,16 +108,39 @@ const TableWrapper = styled.div`
 
 export const PepperTable = () => {
   const [game, setGame] = useState(Pepper(roundData));
+  const [moves, setMoves] = useState([]);
   const nextMove = () => {
     try {
-      game.interact({ id: game.state.id, player: game.state.player, payload: game.bot() });
+      const nextAction = { id: game.state.id, player: game.state.player, payload: game.bot() };
+      game.interact(nextAction);
+      setGame(Pepper(game.data));
+      setMoves([...moves, nextAction]);
     } catch(e) {
       alert(e);
     }
-    setGame(Pepper(game.data));
   };
   return (
     <TableWrapper className="table">
+      <FeedWrapper>
+        <ul>
+          {
+            moves.map((action:ActionInput, i:number) => (
+              <li key={i}>
+                Player #{action.player+1} {actionName(action.id)}s&nbsp;
+                {
+                  action.id === ACTION_BID && `${action.payload}`
+                }
+                {
+                  action.id === ACTION_TRUMP && suitName(action.payload)
+                }
+                {
+                  action.id != ACTION_BID && action.id !== ACTION_TRUMP && cardName(action.payload)
+                }
+              </li>
+            ))
+          }
+        </ul>
+      </FeedWrapper>
       <CenterWrapper>
         <h2>State:</h2>
         <h1>
@@ -77,23 +148,48 @@ export const PepperTable = () => {
             {
               ${game.state.id},
               ${game.state.player},
-              ${game.state.modifier},
-              ${game.bot()}
+              ${game.state.modifier}
             }
           `}
         </h1>
         <button onClick={ () => nextMove() }>Bot</button>
       </CenterWrapper>
-      <BottomCenterWrapper>
+      <BottomHandWrapper>
         <HandWrapper>
-          <Card suit="S" face="A" />
-          <Card suit="S" face="K" />
-          <Card suit="S" face="Q" />
-          <Card suit="S" face="J" disabled />
-          <Card suit="S" face="T" />
-          <Card suit="S" face="9" />
+          {
+            game.round.hands[0].filter(c => !game.round.plays.includes(c)).map(cardId => (
+              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 0} />
+            ))
+          }
         </HandWrapper>
-      </BottomCenterWrapper>
+      </BottomHandWrapper>
+      <LeftHandWrapper>
+        <HandWrapper>
+          {
+            game.round.hands[1].filter(c => !game.round.plays.includes(c)).map(cardId => (
+              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 1} />
+            ))
+          }
+        </HandWrapper>
+      </LeftHandWrapper>
+      <TopHandWrapper>
+        <HandWrapper>
+          {
+            game.round.hands[2].filter(c => !game.round.plays.includes(c)).map(cardId => (
+              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 2} />
+            ))
+          }
+        </HandWrapper>
+      </TopHandWrapper>
+      <RightHandWrapper>
+        <HandWrapper>
+          {
+            game.round.hands[3].filter(c => !game.round.plays.includes(c)).map(cardId => (
+              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 3} />
+            ))
+          }
+        </HandWrapper>
+      </RightHandWrapper>
     </TableWrapper>
   );
 };

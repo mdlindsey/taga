@@ -48,7 +48,7 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
     // Can we play the highest of the led suit?
     const suitToFollow = cardSuit(trick[0], trump);
     const highestOfSuitInHand = highestOfSuit(suitToFollow, cardsInHand, plays, trump);
-    if (highestOfSuitInHand === highestOfSuitUnplayed(suitToFollow, plays, trump)) {
+    if (highestOfSuitInHand >= 0 && highestOfSuitInHand === highestOfSuitUnplayed(suitToFollow, plays, trump)) {
         return highestOfSuitInHand;
     }
     // Can we play trump?

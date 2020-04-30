@@ -1,3 +1,5 @@
+import { FORMERR } from "dns"
+
 // GAME REQUIREMENTS
 export const MIN_BID = 3
 export const MAX_BID = 6
@@ -37,27 +39,42 @@ export const TRUMP_DIAMONDS = SUIT_D
 export const SWAP_REFUSE = -1
 
 // CARDS
-export const SA = 0
-export const SK = 1
-export const SQ = 2
-export const SJ = 3
-export const ST = 4
-export const S9 = 5
-export const HA = 6
-export const HK = 7
-export const HQ = 8
-export const HJ = 9
-export const HT = 10
-export const H9 = 11
-export const CA = 12
-export const CK = 13
-export const CQ = 14
-export const CJ = 15
-export const CT = 16
-export const C9 = 17
-export const DA = 18
-export const DK = 19
-export const DQ = 20
-export const DJ = 21
-export const DT = 22
-export const D9 = 23
+export const SA = SUIT_S * REQ_CARDS_PER_SUIT + 0
+export const SK = SUIT_S * REQ_CARDS_PER_SUIT + 1
+export const SQ = SUIT_S * REQ_CARDS_PER_SUIT + 2
+export const SJ = SUIT_S * REQ_CARDS_PER_SUIT + 3
+export const ST = SUIT_S * REQ_CARDS_PER_SUIT + 4
+export const S9 = SUIT_S * REQ_CARDS_PER_SUIT + 5
+export const HA = SUIT_H * REQ_CARDS_PER_SUIT + 0
+export const HK = SUIT_H * REQ_CARDS_PER_SUIT + 1
+export const HQ = SUIT_H * REQ_CARDS_PER_SUIT + 2
+export const HJ = SUIT_H * REQ_CARDS_PER_SUIT + 3
+export const HT = SUIT_H * REQ_CARDS_PER_SUIT + 4
+export const H9 = SUIT_H * REQ_CARDS_PER_SUIT + 5
+export const CA = SUIT_C * REQ_CARDS_PER_SUIT + 0
+export const CK = SUIT_C * REQ_CARDS_PER_SUIT + 1
+export const CQ = SUIT_C * REQ_CARDS_PER_SUIT + 2
+export const CJ = SUIT_C * REQ_CARDS_PER_SUIT + 3
+export const CT = SUIT_C * REQ_CARDS_PER_SUIT + 4
+export const C9 = SUIT_C * REQ_CARDS_PER_SUIT + 5
+export const DA = SUIT_D * REQ_CARDS_PER_SUIT + 0
+export const DK = SUIT_D * REQ_CARDS_PER_SUIT + 1
+export const DQ = SUIT_D * REQ_CARDS_PER_SUIT + 2
+export const DJ = SUIT_D * REQ_CARDS_PER_SUIT + 3
+export const DT = SUIT_D * REQ_CARDS_PER_SUIT + 4
+export const D9 = SUIT_D * REQ_CARDS_PER_SUIT + 5
+
+export const cardMap:string[] = [];
+export const suitMap:string[] = [];
+suitMap[SUIT_S] = 'S';
+suitMap[SUIT_H] = 'H';
+suitMap[SUIT_C] = 'C';
+suitMap[SUIT_D] = 'D';
+export const faceMap:string[] = ['A', 'K', 'Q', 'J', 'T', '9'];
+for(const suitIdStr in suitMap) {
+    const suitId = Number(suitIdStr);
+    for(const faceIdStr in faceMap) {
+        const faceId = Number(faceIdStr);
+        cardMap[suitId * REQ_CARDS_PER_SUIT + faceId] = suitMap[suitId] + faceMap[faceId];
+    }
+}
