@@ -25,19 +25,24 @@ import {
     sortCardsByRank,
     cardSuit,
     canFollowSuit,
-    activeTrick
+    activeTrick,
+    lastTrick
 } from './util';
+import { act } from './bot';
 export class GameInstance implements GameModel {
     public data:RoundData[];
     public round:RoundModel;
     public state:ActionState;
     public score:ScoreModel;
-    constructor(rounds) {
+    constructor(rounds:RoundData[]) {
         this.data = rounds;
         this.normalizeRound();
         this.reduceExpectedState();
     }
-    interact(action:ActionInput) {
+    bot():number {
+        return act(this);
+    }
+    interact(action:ActionInput):GameModel {
         if (action.id !== this.state.id) {
             throw new Error(`unexpected action[${action.id}]; expecting action[${this.state.id}]`);
         }
@@ -182,17 +187,21 @@ export class GameInstance implements GameModel {
             this.state = { id: ACTION_PLAY, player: highestBidderIndex, modifier: MOD_NA };
             return;
         }
-        const trick = activeTrick(this.round.bids, this.round.plays);
-        if (this.round.plays.length % totalActivePlayers !== 0) {
+        if (this.round.plays.length % totalActivePlayers > 0) {
             // next player's turn to follow suit (if applicable)
+            const trick = activeTrick(this.round.bids, this.round.plays);
             const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % totalActivePlayers;
             this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
         // Trick taker's turn to play any suit
+        const trick = lastTrick(this.round.bids, this.round.plays);
         const rankedTrick = trick.sort((c1, c2) => sortCardsByRank(c1, c2, this.round.trump));
         const highestCardIndex = trick.indexOf(rankedTrick[0]);
         const trickTakerIndex = ( highestBidderIndex + highestCardIndex) % totalActivePlayers;
+        if (trickTakerIndex < 0) {
+            debugger;
+        }
         this.state = { id: ACTION_PLAY, player: trickTakerIndex, modifier: MOD_NA };
     }
 }

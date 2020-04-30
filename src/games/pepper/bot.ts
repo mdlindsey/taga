@@ -1,21 +1,36 @@
 import {
+    Hand,
     GameModel,
-    RoundModel,
-    ActionInput,
-    ActionState,
-    RoundData,
-    ScoreModel,
 } from './@types';
 import {
     TRUMP_NONE,
     REQ_PLAYERS,
     REQ_CARDS_PER_SUIT,
     REQ_CARDS_PER_PLAYER,
+    ACTION_BID,
+    ACTION_TRUMP,
+    ACTION_SWAP,
+    ACTION_PLAY,
 } from './config';
 import { activeTrick, cardSuit, sortCardsByRank, canFollowSuit, isHighTrump, isBowerTrump } from './util';
 
 export const act = (game:GameModel):number => {
-    return play(game.round.hands[game.state.player], game.round.bids, game.round.plays, game.round.trump);
+    const { state, round: { bids, plays, hands, trump, swaps } } = game;
+    const hand = hands[state.player];
+    if (!hand) {
+        debugger;
+    }
+    switch(game.state.id) {
+        default:
+        case ACTION_BID:
+            return bidWithTrump(hand).bid;
+        case ACTION_TRUMP:
+            return bidWithTrump(hand).trump;
+        case ACTION_SWAP:
+            return swap(hand, plays, trump, swaps);
+        case ACTION_PLAY:
+            return play(hand, bids, plays, trump);
+    }
 };
 
 export const play = (hand:number[], bids:number[], plays:number[], trump:number):number => {
@@ -81,26 +96,77 @@ const sluff = (hand:number[], plays:number[], trump:number):number => {
         return cardsInHand[0];
     }
     // get lowest card of shortest suit with lowest high card
-    const groupedBySuit:number[][] = [];
-    for(const card of cardsInHand) {
-        groupedBySuit[cardSuit(card, trump)].push(card);
-    }
-    // check which suit has the lowest high card
     let suitWithLowestHigh:number = -1;
-    for(const suitStr in groupedBySuit) {
-        const suit = Number(suitStr);
-        if (!groupedBySuit[suit] || !groupedBySuit[suit].length) {
+    const groupedBySuits:number[][] = [];
+    for(let suit = 0; suit < 4; suit++) {
+        groupedBySuits[suit] = cardsInHand.filter(card => cardSuit(card, trump) === suit);
+        if (!groupedBySuits[suit].length) {
             continue;
         }
-        const bestOfSuit = highestOfSuit(suit, groupedBySuit[suit], plays, trump);
-        const lowestHighBest = highestOfSuit(suitWithLowestHigh, groupedBySuit[suitWithLowestHigh], plays, trump);
-        if (!suit || cardRankBySuit(bestOfSuit, trump) > cardRankBySuit(lowestHighBest, suitWithLowestHigh)) {
+        const bestOfSuit = highestOfSuit(suit, groupedBySuits[suit], plays, trump);
+        const lowestHighBest = highestOfSuit(suitWithLowestHigh, groupedBySuits[suitWithLowestHigh], plays, trump);
+        if (suitWithLowestHigh === -1 || cardRankBySuit(bestOfSuit, trump) > cardRankBySuit(lowestHighBest, suitWithLowestHigh)) {
             // if the card rank is greater the card value is worse
             suitWithLowestHigh = suit;
         }
     }
     // play the worst card of the lowest high suit
-    return groupedBySuit[suitWithLowestHigh].sort((c1, c2) => sortCardsByRank(c1, c2, trump))[groupedBySuit[suitWithLowestHigh].length - 1];
+    return groupedBySuits[suitWithLowestHigh].sort((c1, c2) => sortCardsByRank(c1, c2, trump))[groupedBySuits[suitWithLowestHigh].length - 1];
+};
+
+const swap = (hand:Hand, plays:number[], trump:number, swaps:number[]):number => {
+    if (swaps.length) {
+        return sluff(hand, plays, trump);
+    }
+    return -1;
+};
+
+const bidWithTrump = (hand:Hand):{bid:number, trump:number} => {
+    let noTrumpBid = 0;
+    let maxTrumpBid = 0;
+    let maxTrumpSuit = TRUMP_NONE;
+    for(let suit = 0; suit < 4; suit++) {
+        const cardsOfSuitNoTrump = hand.filter(card => cardSuit(card, TRUMP_NONE) === suit);
+        noTrumpBid += noTrumpBidForSuit(cardsOfSuitNoTrump);
+        const cardsOfSuitTrump = hand.filter(card => cardSuit(card, suit) === suit);
+        const bidTrump = trumpBidForSuit(cardsOfSuitTrump, suit);
+        if (bidTrump > maxTrumpBid) {
+            maxTrumpBid = bidTrump;
+            maxTrumpSuit = suit;
+        }
+    }
+    if (maxTrumpBid > noTrumpBid) {
+        return { bid: maxTrumpBid, trump: maxTrumpSuit };
+    }
+    return { bid: noTrumpBid, trump: TRUMP_NONE };
+};
+
+const trumpBidForSuit = (cardsOfSameSuit:number[], trump:number):number => {
+    const ranks = cardsOfSameSuit.map(card => cardRankBySuit(card, trump));
+    if (ranks.includes(0)) {
+        if (ranks.includes(1)) {
+            if (ranks.includes(2)) {
+                return ranks.length;
+            }
+            return ranks.length - 1;
+        }
+        return 1;
+    }
+    if (ranks.length >= 5 || (ranks.includes(1) && ranks.length >= 4)) {
+        return ranks.length - 1;
+    }
+    return 0;
+};
+
+const noTrumpBidForSuit = (cardsOfSameSuit:number[]):number => {
+    const ranks = cardsOfSameSuit.map(card => cardRankBySuit(card, TRUMP_NONE));
+    if (ranks.includes(0)) {
+        if (ranks.includes(1)) {
+            return ranks.length;
+        }
+        return 1;
+    }
+    return 0;
 };
 
 const highestOfSuitUnplayed = (suitToFollow:number, plays:number[], trump:number):number => {

@@ -84,5 +84,10 @@ export const canFollowSuit = (suitToFollow:number, hand:number[], plays:number[]
 export const activeTrick = (bids:number[], plays:number[]):number[] => {
     const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
     const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
-    return plays.slice(trickStartingIndex, plays.length-1);
+    return plays.slice(trickStartingIndex);
+};
+export const lastTrick = (bids:number[], plays:number[]):number[] => {
+    const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
+    const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
+    return plays.slice(trickStartingIndex - totalActivePlayers, plays.length - 1);
 };

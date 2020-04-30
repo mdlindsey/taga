@@ -6,7 +6,7 @@ import { linkTo } from '@storybook/addon-links';
 
 export default {
   title: 'Welcome',
-  component: {},
+  component: <></>,
 };
 
 export const Intro = () => (

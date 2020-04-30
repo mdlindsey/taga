@@ -1,27 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/web/Card';
 import { hands } from '../__mocks__/pepper';
 import Pepper from '../src/games/pepper';
+import { RoundData } from '../src/games/pepper/@types';
 
 export default {
   title: 'Web.Integrations',
-  component: {},
+  component: Card,
 };
 
-const roundData = [
+const roundData:RoundData[] = [
   {
     actions: [],
-    hands: [
-      []
-    ]
+    hands: hands.pepper
   }
 ];
-const pepper = Pepper(roundData);
 
 const BottomCenterWrapper = styled.div`
   position: fixed;
   bottom: -6rem;
+  width: 100%;
+  text-align: center;
+`;
+
+const CenterWrapper = styled.div`
+  position: fixed;
+  z-index: 99999;
+  bottom: 50%;
   width: 100%;
   text-align: center;
 `;
@@ -52,8 +58,32 @@ const TableWrapper = styled.div`
     }
 `;
 
-export const PepperTable = () => (
-  <TableWrapper className="table">
+export const PepperTable = () => {
+  const [game, setGame] = useState(Pepper(roundData));
+  const nextMove = () => {
+    try {
+      game.interact({ id: game.state.id, player: game.state.player, payload: game.bot() });
+    } catch(e) {
+      alert(e);
+    }
+    setGame(Pepper(game.data));
+  };
+  return (
+    <TableWrapper className="table">
+      <CenterWrapper>
+        <h2>State:</h2>
+        <h1>
+          State: {`
+            {
+              ${game.state.id},
+              ${game.state.player},
+              ${game.state.modifier},
+              ${game.bot()}
+            }
+          `}
+        </h1>
+        <button onClick={ () => nextMove() }>Bot</button>
+      </CenterWrapper>
       <BottomCenterWrapper>
         <HandWrapper>
           <Card suit="S" face="A" />
@@ -64,8 +94,9 @@ export const PepperTable = () => (
           <Card suit="S" face="9" />
         </HandWrapper>
       </BottomCenterWrapper>
-  </TableWrapper>
-);
+    </TableWrapper>
+  );
+};
 
 PepperTable.story = {
   name: 'Pepper Game',
