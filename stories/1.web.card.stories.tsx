@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/web/Card';
 
 export default {
-  title: 'Web.Cards',
+  title: 'React.Cards',
   component: Card,
 };
 

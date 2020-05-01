@@ -8,9 +8,18 @@ import {
     SUIT_C,
     SUIT_D,
     MAX_BID,
+    MIN_BID,
+    ACTION_BID,
+    ACTION_TRUMP,
+    ACTION_SWAP,
+    ACTION_PLAY,
     REQ_PLAYERS,
     REQ_CARDS_PER_SUIT,
+    actionMap,
+    suitMap,
+    cardMap,
 } from './config';
+import { ActionState, ActionInput } from './@types';
 export const cardSuit = (card:number, trump:number):number => {
     if (isBowerTrump(card,trump)) {
         switch(card) {
@@ -86,8 +95,46 @@ export const activeTrick = (bids:number[], plays:number[]):number[] => {
     const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
     return plays.slice(trickStartingIndex);
 };
-export const lastTrick = (bids:number[], plays:number[]):number[] => {
+export const prevTrick = (bids:number[], plays:number[]):number[] => {
     const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
     const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
-    return plays.slice(trickStartingIndex - totalActivePlayers, plays.length - 1);
+    return plays.slice(trickStartingIndex - totalActivePlayers, plays.length);
+};
+
+export const translateAction = (action:ActionState|ActionInput|any):string => {
+    if (action.modifier !== undefined) {
+        // Dealing with action state
+        return translateActionState(action);
+    }
+    return translateActionInput(action);
+};
+
+const translateActionState = (action:ActionState):string => {
+    const verb = action.id === ACTION_TRUMP ? 'choose trump' : actionMap[action.id];
+    let modifier = '';
+    if (action.id === ACTION_BID) {
+        modifier = `at least ${action.modifier < MIN_BID ? MIN_BID : action.modifier}`;
+    }
+    if (action.id === ACTION_PLAY || action.id === ACTION_SWAP) {
+        modifier = action.modifier === -1 ? 'any card' : `a ${suitMap[action.modifier]}`;
+    }
+    return `Player #${action.player+1} to ${verb} ${modifier}`;
+};
+
+const translateActionInput = (action:ActionInput):string => {
+    let caption = '';
+    switch(action.id) {
+        case ACTION_TRUMP:
+            caption = `chose ${action.payload < 0 ? 'no' : `${suitMap[action.payload]}s`} trump`;
+            break;
+        case ACTION_SWAP:
+            caption = `swapped ${cardMap[action.payload]}`;
+            break;
+        case ACTION_PLAY:
+            caption = `played ${cardMap[action.payload]}`;
+            break;
+        default:
+            caption = `${actionMap[action.id]}s ${action.payload}`;
+    }
+    return `Player #${action.player+1} ${caption}`;
 };

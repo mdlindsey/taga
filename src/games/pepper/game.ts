@@ -27,7 +27,7 @@ import {
     cardSuit,
     canFollowSuit,
     activeTrick,
-    lastTrick
+    prevTrick,
 } from './util';
 import { act } from './bot';
 export class GameInstance implements GameModel {
@@ -196,8 +196,8 @@ export class GameInstance implements GameModel {
             return;
         }
         // Trick taker's turn to play any suit
-        const trick = lastTrick(this.round.bids, this.round.plays);
-        const rankedTrick = trick.sort((c1, c2) => sortCardsByRank(c1, c2, this.round.trump));
+        const trick = prevTrick(this.round.bids, this.round.plays);
+        const rankedTrick = trick.sort((c1:number, c2:number) => sortCardsByRank(c1, c2, this.round.trump));
         const highestCardIndex = trick.indexOf(rankedTrick[0]);
         const trickTakerIndex = ( highestBidderIndex + highestCardIndex) % totalActivePlayers;
         if (trickTakerIndex < 0) {
