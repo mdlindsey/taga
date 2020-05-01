@@ -7,8 +7,8 @@ import styled, { css } from 'styled-components';
     disabled - if truthy will dim the card and prevent uplift on hover for HandWrapper
 */
 export interface CardProps {
-    suit: string
-    face: string
+    suit?: string
+    face?: string
     disabled?: boolean
     onClick?: CardCallback
     onMouseOver?: CardCallback
@@ -43,7 +43,7 @@ const CardWrapper:any = styled.span`
         `
     }
 `;
-export default ({ suit, face, disabled, onClick=()=>{}, onMouseOver=()=>{} }:CardProps) => {
+export default ({ suit='', face='', disabled=false, onClick=()=>{}, onMouseOver=()=>{} }:CardProps) => {
     const cardImg = validSuit(suit) && validFace(face) ? String(suit + face).toUpperCase() : 'BACK';
     return (
         <CardWrapper

@@ -16,14 +16,13 @@
     "url": "git+https://github.com/mdlindsey/deckd.git"
   },
   "keywords": [
+    "cards",
+    "chips",
+    "casino",
     "poker",
     "blackjack",
     "spades",
-    "hearts",
-    "casino",
-    "cards",
-    "chips",
-    "react"
+    "hearts"
   ],
   "license": "MIT",
   "bugs": {

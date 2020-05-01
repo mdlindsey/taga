@@ -149,6 +149,11 @@ export class GameInstance implements GameModel {
         // Determine if a player is sitting out due to a partner peppering
         const highestBid = Math.max(...this.round.bids);
         const totalActivePlayers = highestBid !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
+        if (this.round.bids.length === REQ_PLAYERS && Math.max(...this.round.bids) < MIN_BID) {
+            // Everyone passed, redeal and start new round
+            this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };
+            return;
+        }
         if (this.round.plays.length === totalActivePlayers * REQ_CARDS_PER_PLAYER) {
             // All cards are played, start a new round
             this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };

@@ -43,7 +43,6 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
                 return card;
             }
         }
-        return sluff(hand, plays, trump);
     }
     // Can we play the highest of the led suit?
     const suitToFollow = cardSuit(trick[0], trump);
@@ -51,10 +50,16 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
     if (highestOfSuitInHand >= 0 && highestOfSuitInHand === highestOfSuitUnplayed(suitToFollow, plays, trump)) {
         return highestOfSuitInHand;
     }
+    // Do we have to follow suit?
+    const mustFollowSuit = canFollowSuit(suitToFollow, hand, plays, trump);
+    if (mustFollowSuit) {
+        // Play the lowest of this suit
+        const cardsInHandOfSuit = cardsInHand.filter(card => cardSuit(card, trump) === suitToFollow).sort((c1, c2) => sortCardsByRank(c1, c2, trump));
+        return cardsInHandOfSuit[cardsInHandOfSuit.length - 1];
+    }
     // Can we play trump?
     const canPlayTrump = canFollowSuit(trump, hand, plays, trump);
-    const mustFollowSuit = canFollowSuit(suitToFollow, hand, plays, trump);
-    if (!canPlayTrump || mustFollowSuit) {
+    if (!canPlayTrump) {
         // Can't trump, just sluff
         return sluff(hand, plays, trump);
     }
@@ -67,7 +72,7 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
         case 2: partnerIndex = 0; break;
         case 3: partnerIndex = 1; break;
     }
-    const ourTrump = cardsInHand.sort((c1, c2) => sortCardsByRank(c1, c2, trump)).filter(card => cardSuit(card, trump) === trump);
+    const ourTrump = cardsInHand.filter(card => cardSuit(card, trump) === trump).sort((c1, c2) => sortCardsByRank(c1, c2, trump));
     const opponentsTrump = trick.filter((card:number, index:number) => index !== partnerIndex && cardSuit(card, trump) === trump);
     if (!opponentsTrump.length) {
         // No trump played, play a low trump and hope it goes through

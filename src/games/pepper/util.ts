@@ -18,8 +18,23 @@ import {
     actionMap,
     suitMap,
     cardMap,
+    REQ_CARDS_PER_PLAYER,
 } from './config';
 import { ActionState, ActionInput } from './@types';
+export const deal = ():number[][] => {
+    const hands:number[][] = [];
+    for(let i = 0; i < REQ_PLAYERS; i++) {
+        hands[i] = [];
+        for(let j = 0; j < REQ_CARDS_PER_PLAYER; j++) {
+            let randomCard = -1;
+            while(randomCard < 0 || [].concat.apply([], hands).includes(randomCard)) {
+                randomCard = Math.floor(Math.random() * Math.floor(REQ_PLAYERS * REQ_CARDS_PER_PLAYER));
+            }
+            hands[i].push(randomCard);
+        }
+    }
+    return hands;
+};
 export const cardSuit = (card:number, trump:number):number => {
     if (isBowerTrump(card,trump)) {
         switch(card) {
@@ -128,7 +143,7 @@ const translateActionInput = (action:ActionInput):string => {
             caption = `chose ${action.payload < 0 ? 'no' : `${suitMap[action.payload]}s`} trump`;
             break;
         case ACTION_SWAP:
-            caption = `swapped ${cardMap[action.payload]}`;
+            caption = action.payload < 0 ? 'declined swap' : `swapped ${cardMap[action.payload]}`;
             break;
         case ACTION_PLAY:
             caption = `played ${cardMap[action.payload]}`;
@@ -137,4 +152,17 @@ const translateActionInput = (action:ActionInput):string => {
             caption = `${actionMap[action.id]}s ${action.payload}`;
     }
     return `Player #${action.player+1} ${caption}`;
+};
+
+export const sortCardsForHand = (cards:number[], trump:number):number[] => {
+    // Group by suit
+    const suits:number[][] = [[],[],[],[]];
+    for(const card of cards) {
+        suits[cardSuit(card, trump)].push(card);
+    }
+    // Order suits highest to lowest
+    for(const suit in suits) {
+        suits[suit] = suits[suit].sort((c1:number,c2:number) => sortCardsByRank(c1, c2, trump));
+    }
+    return [].concat.apply([], suits.sort((s1:number[], s2:number[]) => s2.length - s1.length));
 };

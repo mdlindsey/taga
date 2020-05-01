@@ -11,19 +11,8 @@ export default {
 
 const { Config: {
   cardMap,
-  suitMap,
-  actionMap,
-  ACTION_BID,
-  ACTION_TRUMP,
   ACTION_PLAY,
 } } = Pepper;
-
-const roundData = [
-  {
-    actions: [],
-    hands: hands.pepper
-  }
-];
 
 const BottomHandWrapper = styled.div`
   position: fixed;
@@ -185,6 +174,13 @@ const TableWrapper = styled.div`
     }
 `;
 
+const roundData = [
+  {
+    actions: [],
+    hands: Pepper.Util.deal() // hands.pepper
+  }
+];
+
 export const PepperTable = () => {
   const [game, setGame] = useState(new Pepper.GameInstance(roundData));
   const [moves, setMoves] = useState([]);
@@ -212,6 +208,16 @@ export const PepperTable = () => {
     }
     return norm;
   };
+  const HandSorter = (playerIndex:number) => {
+    if (!game.round.hands) {
+      return <></>;
+    }
+    return Pepper.Util.sortCardsForHand(game.round.hands[playerIndex], game.round.trump)
+    .filter(c => !game.round.plays.includes(c)).map(cardId => (
+      <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} 
+        disabled={game.state.id === ACTION_PLAY && game.state.player !== playerIndex} />
+    ));
+  };
   useEffect(() => {
     setTrickClass('');
     const activeTrick = Pepper.Util.activeTrick(game.round.bids, game.round.plays);
@@ -236,21 +242,15 @@ export const PepperTable = () => {
           {
             moves.map((action, i:number) => (
               <li key={i}>
-                Player #{action.player+1} {actionMap[action.id]}s&nbsp;
-                {
-                  action.id === ACTION_BID && `${action.payload}`
-                }
-                {
-                  action.id === ACTION_TRUMP && suitMap[action.payload]
-                }
-                {
-                  action.id != ACTION_BID && action.id !== ACTION_TRUMP && cardMap[action.payload]
-                }
+                {Pepper.Util.translateAction(action)}
               </li>
             ))
           }
         </ul>
-        <span>Bot suggests</span><button onClick={ () => nextMove() }>Accept</button>
+        <span>
+          {Pepper.Util.translateAction({ id: game.state.id, player: game.state.player, payload: game.bot() })}
+        </span>
+        <button onClick={ () => nextMove() }>Accept</button>
       </FeedWrapper>
       <CenterWrapper className={trickClass}>
         {
@@ -264,36 +264,28 @@ export const PepperTable = () => {
       <BottomHandWrapper>
         <HandWrapper>
           {
-            game.round.hands[0].filter(c => !game.round.plays.includes(c)).map(cardId => (
-              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 0} />
-            ))
+            HandSorter(0)
           }
         </HandWrapper>
       </BottomHandWrapper>
       <LeftHandWrapper>
         <HandWrapper>
           {
-            game.round.hands[1].filter(c => !game.round.plays.includes(c)).map(cardId => (
-              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 1} />
-            ))
+            HandSorter(1)
           }
         </HandWrapper>
       </LeftHandWrapper>
       <TopHandWrapper>
         <HandWrapper>
           {
-            game.round.hands[2].filter(c => !game.round.plays.includes(c)).map(cardId => (
-              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 2} />
-            ))
+            HandSorter(2)
           }
         </HandWrapper>
       </TopHandWrapper>
       <RightHandWrapper>
         <HandWrapper>
           {
-            game.round.hands[3].filter(c => !game.round.plays.includes(c)).map(cardId => (
-              <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} disabled={game.state.id === ACTION_PLAY && game.state.player !== 3} />
-            ))
+            HandSorter(3)
           }
         </HandWrapper>
       </RightHandWrapper>
