@@ -17,9 +17,6 @@ import { activeTrick, cardSuit, sortCardsByRank, canFollowSuit, isHighTrump, isB
 export const act = (game:GameModel):number => {
     const { state, round: { bids, plays, hands, trump, swaps } } = game;
     const hand = hands[state.player];
-    if (!hand) {
-        debugger;
-    }
     switch(game.state.id) {
         default:
         case ACTION_BID:
@@ -39,7 +36,7 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
     if (!trick.length) {
         // see if we have the highest of any suit
         for(const card of cardsInHand) {
-            if (card === highestOfSuitUnplayed(cardSuit(card, trump), plays, trump)) {
+            if (card === highestOfSuitUnplayed(cardSuit(card, trump), plays, trump, trick)) {
                 return card;
             }
         }
@@ -47,7 +44,7 @@ export const play = (hand:number[], bids:number[], plays:number[], trump:number)
     // Can we play the highest of the led suit?
     const suitToFollow = cardSuit(trick[0], trump);
     const highestOfSuitInHand = highestOfSuit(suitToFollow, cardsInHand, plays, trump);
-    if (highestOfSuitInHand >= 0 && highestOfSuitInHand === highestOfSuitUnplayed(suitToFollow, plays, trump)) {
+    if (highestOfSuitInHand >= 0 && highestOfSuitInHand === highestOfSuitUnplayed(suitToFollow, plays, trump, trick)) {
         return highestOfSuitInHand;
     }
     // Do we have to follow suit?
@@ -126,7 +123,7 @@ const swap = (hand:Hand, plays:number[], trump:number, swaps:number[]):number =>
     return -1;
 };
 
-const bidWithTrump = (hand:Hand):{bid:number, trump:number} => {
+const bidWithTrump = (hand:Hand=[]):{bid:number, trump:number} => {
     let noTrumpBid = 0;
     let maxTrumpBid = 0;
     let maxTrumpSuit = TRUMP_NONE;
@@ -174,12 +171,18 @@ const noTrumpBidForSuit = (cardsOfSameSuit:number[]):number => {
     return 0;
 };
 
-const highestOfSuitUnplayed = (suitToFollow:number, plays:number[], trump:number):number => {
+const highestOfSuitUnplayed = (suitToFollow:number, plays:number[], trump:number, trick:number[]=[]):number => {
     // loop through all cards and see which ones belong to this suit that have not been played
     const deck:number[] = [];
     for(let card = 0; card < REQ_PLAYERS * REQ_CARDS_PER_PLAYER; card++) {
         deck.push(card);
     }
+    // console.log('Deck before splicing:', deck);
+    for(const card of trick) {
+        deck.splice(deck.indexOf(card), 1);
+    }
+    // console.log('Deck after splicing:', deck);
+    // console.log('Highest of suit:', highestOfSuit(suitToFollow, deck, plays, trump));
     return highestOfSuit(suitToFollow, deck, plays, trump);
 }
 

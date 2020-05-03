@@ -13,7 +13,7 @@ export const AllCards = () => (
     {
       ['S', 'H', 'C', 'D'].map(
         suit => ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'].map(
-          face => <Card suit={suit} face={face} />
+          face => <Card suit={suit} face={face} key={suit+face} />
         )
       )
     }

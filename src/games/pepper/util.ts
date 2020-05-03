@@ -105,15 +105,50 @@ export const canFollowSuit = (suitToFollow:number, hand:number[], plays:number[]
     }
     return false;
 };
+export const totalActivePlayers = (bids:number[]) => Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
 export const activeTrick = (bids:number[], plays:number[]):number[] => {
-    const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
-    const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
+    const trickStartingIndex = plays.length < totalActivePlayers(bids) ? 0 : plays.length - (plays.length % totalActivePlayers(bids));
     return plays.slice(trickStartingIndex);
 };
 export const prevTrick = (bids:number[], plays:number[]):number[] => {
-    const totalActivePlayers = Math.max(...bids) !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
-    const trickStartingIndex = plays.length < totalActivePlayers ? 0 : plays.length - (plays.length % totalActivePlayers);
-    return plays.slice(trickStartingIndex - totalActivePlayers, plays.length);
+    const trickStartingIndex = Math.floor(plays.length / totalActivePlayers(bids)) * totalActivePlayers(bids);
+    return plays.slice(trickStartingIndex - totalActivePlayers(bids), trickStartingIndex + totalActivePlayers(bids));
+};
+
+export const lastTrickTaker = (bids:number[], plays:number[], trump:number, roundCount:number) => {
+    // Group plays into tricks
+    const tricks:number[][] = [];
+    const playerCount = totalActivePlayers(bids);
+    for(let i = 0; i < plays.length; i++) {
+        const trickIndex = Math.floor(i / playerCount);
+        if (!tricks[trickIndex]) {
+            tricks[trickIndex] = [];
+        }
+        tricks[trickIndex].push(plays[i]);
+    }
+    // Loop through tricks and determine who took each one
+    const takers:number[] = [];
+    for(let i = 0; i < tricks.length; i++) {
+        console.log(`[TT] Trick:`, tricks[i]);
+        const rankedTrick = tricks[i].sort((c1:number, c2:number) => sortCardsByRank(c1, c2, trump));
+        const highestCardIndex = tricks[i].indexOf(rankedTrick[0]);
+        console.log(`[TT] Trick:`, tricks[i]);
+        console.log(`[TT] High card index: ${highestCardIndex}`);
+        if (i > 0) {
+            // If it's not the first trick, the trick taker's index is lastTrickTakerIndex + highCardIndex
+            takers[i] = takers[i-1] + highestCardIndex;
+            console.log(`[TT] Trick #${i+1} taken by #${takers[i]+1}`);
+            continue;
+        }
+        // If it's the first trick, the trick taker's index is bidderIndex + highCardIndex 
+        const firstBidderIndex = (roundCount - 1) % REQ_PLAYERS;
+        const highestBidderIndex = firstBidderIndex + bids.indexOf(Math.max(...bids));
+        takers[i] = highestBidderIndex + highestCardIndex;
+        console.log(`[TT] First trick! Taken by ${takers[i] + highestCardIndex + 1}`);
+    }
+    // Determine who took the last trick
+    console.log(`[TT][LT] Last trick taken by Player #${takers[takers.length-1]+1}`);
+    return takers[takers.length - 1];
 };
 
 export const translateAction = (action:ActionState|ActionInput|any):string => {

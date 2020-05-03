@@ -23,7 +23,7 @@ export interface ActionInput {
 }
 // Raw data (from db)
 export interface RoundData {
-    hands: Hand[]
+    hands: number[][]
     actions: ActionData[]
 }
 export interface ActionData {
@@ -31,12 +31,11 @@ export interface ActionData {
     payload: number
 }
 // Modeling
-export type Hand = number[];
 export type ScoreModel = { tricks: number, score: number }[];
 export interface RoundModel {
     bids: number[]
     swaps: number[]
     trump: number
     plays: number[]
-    hands: Hand[]
+    hands: number[][]
 }

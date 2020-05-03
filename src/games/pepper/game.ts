@@ -28,6 +28,8 @@ import {
     canFollowSuit,
     activeTrick,
     prevTrick,
+    totalActivePlayers,
+    lastTrickTaker,
 } from './util';
 import { act } from './bot';
 export class GameInstance implements GameModel {
@@ -55,10 +57,11 @@ export class GameInstance implements GameModel {
             if (action.payload > MAX_BID) {
                 throw new Error(`bid (${action.payload}) exceeds max (${MAX_BID})`);
             }
-            const highestBid = Math.max(...this.round.bids);
-            if (action.payload <= highestBid && action.payload >= MIN_BID) {
-                throw new Error(`must pass (bid 0) or bid more than ${highestBid}`);
-            }
+            // Testing without this - if we only take max bids does this matter?
+            // const highestBid = Math.max(...this.round.bids);
+            // if (action.payload <= highestBid && action.payload >= MIN_BID) {
+            //     throw new Error(`must pass (bid 0) or bid more than ${highestBid}`);
+            // }
         }
         if (action.id === ACTION_TRUMP) {
             // Ensure -1 <= trump =< 3
@@ -104,9 +107,19 @@ export class GameInstance implements GameModel {
         return this;
     }
     normalizeRound() {
+        const round = this.data[this.data.length - 1];
+        if (!round || !round.actions || !round.hands) {
+            this.round = {
+                bids: [],
+                trump: -2,
+                swaps: [],
+                plays: [],
+                hands: [],
+            };
+            return;
+        }
         // Separate actions into bids, trump, swaps, and plays 
         let trump = -2; // -2: unset, -1: no trump, 0-3: suit index trump
-        const round = this.data[this.data.length - 1];
         const bids:number[] = [], swaps:number[] = [], plays:number[] = [];
         for(const action of round.actions) {
             switch(action.id) {
@@ -148,13 +161,17 @@ export class GameInstance implements GameModel {
     reduceExpectedState() {
         // Determine if a player is sitting out due to a partner peppering
         const highestBid = Math.max(...this.round.bids);
-        const totalActivePlayers = highestBid !== MAX_BID ? REQ_PLAYERS : REQ_PLAYERS - 1;
-        if (this.round.bids.length === REQ_PLAYERS && Math.max(...this.round.bids) < MIN_BID) {
+        const playerCount = totalActivePlayers(this.round.bids);
+        if (!this.round.hands.length || [].concat.apply([], this.round.hands).length < REQ_PLAYERS * REQ_CARDS_PER_PLAYER) {
+            this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };
+            return;
+        }
+        if (this.round.bids.length >= REQ_PLAYERS && Math.max(...this.round.bids) < MIN_BID) {
             // Everyone passed, redeal and start new round
             this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };
             return;
         }
-        if (this.round.plays.length === totalActivePlayers * REQ_CARDS_PER_PLAYER) {
+        if (this.round.plays.length === playerCount * REQ_CARDS_PER_PLAYER) {
             // All cards are played, start a new round
             this.state = { id: ACTION_DEAL, player: PLAYER_NA, modifier: MOD_NA };
             return;
@@ -165,15 +182,16 @@ export class GameInstance implements GameModel {
             this.state = { id: ACTION_BID, player: firstBidderIndex, modifier: MOD_NA };
             return;
         }
-        const highestBidderIndex = firstBidderIndex + this.round.bids.indexOf(highestBid)
+        const highestBidderIndex = firstBidderIndex + this.round.bids.indexOf(highestBid);
         if (this.round.trump === -2) {
-            if (totalActivePlayers !== REQ_PLAYERS || this.round.bids.length === REQ_PLAYERS) {
+            if (playerCount !== REQ_PLAYERS || this.round.bids.length >= REQ_PLAYERS) {
                 // Someone has peppered or everyone has bid, it's the highest bidder's turn to choose trump
                 this.state = { id: ACTION_TRUMP, player: highestBidderIndex, modifier: MOD_NA };
                 return;
             }
             // Otherwise it's the next player's turn to bid
-            this.state = { id: ACTION_BID, player: firstBidderIndex + this.round.bids.length, modifier: highestBid };
+            const nextBidderIndex = (firstBidderIndex + this.round.bids.length) % REQ_PLAYERS;
+            this.state = { id: ACTION_BID, player: nextBidderIndex, modifier: highestBid };
             return;
         }
         // Determine if we need to swap
@@ -193,21 +211,15 @@ export class GameInstance implements GameModel {
             this.state = { id: ACTION_PLAY, player: highestBidderIndex, modifier: MOD_NA };
             return;
         }
-        if (this.round.plays.length % totalActivePlayers > 0) {
+        if (this.round.plays.length % playerCount > 0) {
             // next player's turn to follow suit (if applicable)
             const trick = activeTrick(this.round.bids, this.round.plays);
-            const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % totalActivePlayers;
+            const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % playerCount;
             this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
         // Trick taker's turn to play any suit
-        const trick = prevTrick(this.round.bids, this.round.plays);
-        const rankedTrick = trick.sort((c1:number, c2:number) => sortCardsByRank(c1, c2, this.round.trump));
-        const highestCardIndex = trick.indexOf(rankedTrick[0]);
-        const trickTakerIndex = ( highestBidderIndex + highestCardIndex) % totalActivePlayers;
-        if (trickTakerIndex < 0) {
-            debugger;
-        }
+        const trickTakerIndex = lastTrickTaker(this.round.bids, this.round.plays, this.round.trump, this.data.length);
         this.state = { id: ACTION_PLAY, player: trickTakerIndex, modifier: MOD_NA };
     }
 }

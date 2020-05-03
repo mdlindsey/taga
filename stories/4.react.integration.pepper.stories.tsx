@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Card, { HandWrapper } from '../src/components/web/Card';
 import { hands } from '../__mocks__/pepper';
 import Pepper from '../src/games/pepper';
+import { deal } from '../src/games/pepper/util';
 
 export default {
   title: 'Integrations.React',
@@ -85,13 +86,13 @@ const CenterWrapper = styled.div`
   ${props => {
     switch(props.className) {
       case 'slide-0':
-        return 'bottom: -100%; transition: all 0.7s ease-in-out;'
+        return 'bottom: -100%; transition: all 0.3s ease-in-out;'
       case 'slide-1':
-        return 'transform: translateX(-100%); transition: all 0.7s ease-in-out;'
+        return 'transform: translateX(-100%); transition: all 0.3s ease-in-out;'
       case 'slide-2':
-        return 'bottom: 200%; transition: all 0.7s ease-in-out;'
+        return 'bottom: 200%; transition: all 0.3s ease-in-out;'
       case 'slide-3':
-        return 'transform: translateX(100%); transition: all 0.7s ease-in-out;'
+        return 'transform: translateX(100%); transition: all 0.3s ease-in-out;'
       default:
         return '';
     }
@@ -130,17 +131,15 @@ const FeedWrapper = styled.div`
     }
   }
 
-  span, button {
+  pre:last-of-type, button {
     display: inline-block;
-  }
-
-  span {
-    font-size: 14px;
     width: calc(65% - 12px);
-    padding: 7px 6px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-left: none; border-right: none;
-    background: rgba(255, 255, 255, 0.3);
+  }
+
+  pre {
+    padding: 7px 6px;
   }
 
   button {
@@ -174,15 +173,8 @@ const TableWrapper = styled.div`
     }
 `;
 
-const roundData = [
-  {
-    actions: [],
-    hands: Pepper.Util.deal() // hands.pepper
-  }
-];
-
 export const PepperTable = () => {
-  const [game, setGame] = useState(new Pepper.GameInstance(roundData));
+  const [game, setGame] = useState(new Pepper.GameInstance([]));
   const [moves, setMoves] = useState([]);
   const [trick, setTrick] = useState([]);
   const [trickClass, setTrickClass] = useState('');
@@ -200,7 +192,6 @@ export const PepperTable = () => {
     const norm = [];
     for(const cardId of trick) {
       for(const handIndex in game.round.hands) {
-        const hand = game.round.hands[handIndex];
         if (game.round.hands[handIndex].includes(cardId)) {
           norm.push({ index: handIndex, card: cardId });
         }
@@ -208,13 +199,21 @@ export const PepperTable = () => {
     }
     return norm;
   };
+  const checkForNewRound = () => {
+    if (game.state.id === Pepper.Config.ACTION_DEAL) {
+      const rounds = [...game.data, { actions: [], hands: Pepper.Util.deal() }];
+      setTrick([]);
+      setTrickClass('');
+      setGame(new Pepper.GameInstance(rounds));
+    }
+  };
   const HandSorter = (playerIndex:number) => {
-    if (!game.round.hands) {
+    if (!game.round.hands || !game.round.hands.length) {
       return <></>;
     }
     return Pepper.Util.sortCardsForHand(game.round.hands[playerIndex], game.round.trump)
     .filter(c => !game.round.plays.includes(c)).map(cardId => (
-      <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} 
+      <Card suit={cardMap[cardId][0]} face={cardMap[cardId][1]} key={cardId}
         disabled={game.state.id === ACTION_PLAY && game.state.player !== playerIndex} />
     ));
   };
@@ -229,9 +228,11 @@ export const PepperTable = () => {
     if (prevTrick.length) {
       setTrick(normalizeTrick(prevTrick));
       setTrickClass(`slide-${game.state.player}`);
-      setTimeout(() => { setTrickClass(''); setTrick([]); }, 700);
+      setTimeout(() => { setTrickClass(''); setTrick([]); }, 300);
     }
+    checkForNewRound();
   }, [game]);
+  checkForNewRound();
   return (
     <TableWrapper className="table">
       <FeedWrapper>
@@ -247,15 +248,15 @@ export const PepperTable = () => {
             ))
           }
         </ul>
-        <span>
+        <pre>
           {Pepper.Util.translateAction({ id: game.state.id, player: game.state.player, payload: game.bot() })}
-        </span>
+        </pre>
         <button onClick={ () => nextMove() }>Accept</button>
       </FeedWrapper>
       <CenterWrapper className={trickClass}>
         {
           trick.map(info => (
-            <div className={`index-${info.index}`}>
+            <div className={`index-${info.index}`} key={info.index}>
               <Card suit={cardMap[info.card][0]} face={cardMap[info.card][1]} />
             </div>
           ))
