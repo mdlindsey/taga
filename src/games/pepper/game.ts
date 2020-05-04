@@ -23,11 +23,9 @@ import {
     REQ_CARDS_PER_PLAYER,
 } from './config';
 import {
-    sortCardsByRank,
     cardSuit,
     canFollowSuit,
     activeTrick,
-    prevTrick,
     totalActivePlayers,
     lastTrickTaker,
 } from './util';
