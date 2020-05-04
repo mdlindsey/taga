@@ -12,7 +12,11 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "storybook": "start-storybook -p 6006",
-    "storybook:build": "build-storybook"
+    "storybook:build": "build-storybook",
+    "test": "jest --clearCache && jest --verbose --coverage",
+    "test:update": "npm test -- -u",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "lint": "tslint --project ./tsconfig.json"
   },
   "repository": {
     "type": "git",
