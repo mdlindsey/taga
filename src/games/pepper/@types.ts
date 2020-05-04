@@ -4,6 +4,7 @@ export interface GameModel {
     readonly round: RoundModel
     readonly state: ActionState
     readonly score: ScoreModel
+    readonly rounds: RoundModel[]
     bot(): number // Exposed publicly
     interact(action: ActionInput): GameModel // Exposed publicly
     denormalizeRounds(): void // Populates this.round
