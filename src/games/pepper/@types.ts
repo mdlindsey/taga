@@ -6,7 +6,7 @@ export interface GameModel {
     readonly score: ScoreModel
     bot(): number // Exposed publicly
     interact(action: ActionInput): GameModel // Exposed publicly
-    normalizeRound(): void // Populates this.round
+    denormalizeRounds(): void // Populates this.round
     reduceExpectedState(): void // Populates this.state
 }
 // ActionState dictates next move expectations

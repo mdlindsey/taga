@@ -32,13 +32,16 @@ import {
 import { act } from './bot';
 export class GameInstance implements GameModel {
     public data:RoundData[];
-    public round:RoundModel;
     public state:ActionState;
     public score:ScoreModel;
+    public rounds:RoundModel[];
     constructor(rounds:RoundData[]) {
         this.data = rounds;
-        this.normalizeRound();
+        this.denormalizeRounds();
         this.reduceExpectedState();
+    }
+    get round():RoundModel {
+        return this.rounds[this.rounds.length-1];
     }
     bot():number {
         return act(this);
@@ -91,7 +94,7 @@ export class GameInstance implements GameModel {
         const oldState = {...this.state};
         this.data[this.data.length-1].actions.push({ id: action.id, payload: action.payload });
         // normalize and reduce state again
-        this.normalizeRound();
+        this.denormalizeRounds();
         this.reduceExpectedState();
         if (oldState.id === this.state.id && oldState.player === this.state.player) {
             throw new Error('stale state; please report');
@@ -99,10 +102,10 @@ export class GameInstance implements GameModel {
         // If everything looks good return the updated game state
         return this;
     }
-    normalizeRound() {
-        const round = this.data[this.data.length - 1];
-        if (!round || !round.actions || !round.hands) {
-            this.round = {
+    denormalizeRounds() {
+        this.rounds = [];
+        if (!this.data.length) {
+            this.rounds[0] = {
                 bids: [],
                 trump: -2,
                 swaps: [],
@@ -111,45 +114,47 @@ export class GameInstance implements GameModel {
             };
             return;
         }
-        // Separate actions into bids, trump, swaps, and plays 
-        let trump = -2; // -2: unset, -1: no trump, 0-3: suit index trump
-        const bids:number[] = [], swaps:number[] = [], plays:number[] = [];
-        for(const action of round.actions) {
-            switch(action.id) {
-                case ACTION_BID:
-                    bids.push(action.payload);
-                    break;
-                case ACTION_TRUMP:
-                    trump = action.payload;
-                    break;
-                case ACTION_SWAP:
-                    swaps.push(action.payload);
-                    break;
-                case ACTION_PLAY:
-                    plays.push(action.payload);
-                    break;
-            }
-        }
-        // Determine if we need to swap any cards in anyone's hand from a pepper swap
-        const hands = round.hands;
-        if (swaps.length === 2) {
-            for(const handIndex in hands) {
-                for(const cardIndex in hands[handIndex]) {
-                    if (hands[handIndex][cardIndex] === swaps[0])
-                        hands[handIndex][cardIndex] = swaps[1];
-                    if (hands[handIndex][cardIndex] === swaps[1])
-                        hands[handIndex][cardIndex] = swaps[0];
+        for(const roundIndex in this.data) {
+            const round = this.data[roundIndex];
+            // Separate actions into bids, trump, swaps, and plays 
+            let trump = -2; // -2: unset, -1: no trump, 0-3: suit index trump
+            const bids:number[] = [], swaps:number[] = [], plays:number[] = [];
+            for(const action of round.actions) {
+                switch(action.id) {
+                    case ACTION_BID:
+                        bids.push(action.payload);
+                        break;
+                    case ACTION_TRUMP:
+                        trump = action.payload;
+                        break;
+                    case ACTION_SWAP:
+                        swaps.push(action.payload);
+                        break;
+                    case ACTION_PLAY:
+                        plays.push(action.payload);
+                        break;
                 }
             }
+            // Determine if we need to swap any cards in anyone's hand from a pepper swap
+            const hands = round.hands;
+            if (swaps.length === 2) {
+                for(const handIndex in hands) {
+                    for(const cardIndex in hands[handIndex]) {
+                        if (hands[handIndex][cardIndex] === swaps[0])
+                            hands[handIndex][cardIndex] = swaps[1];
+                        if (hands[handIndex][cardIndex] === swaps[1])
+                            hands[handIndex][cardIndex] = swaps[0];
+                    }
+                }
+            }
+            this.rounds[roundIndex] = {
+                bids,
+                trump,
+                swaps,
+                plays,
+                hands,
+            };
         }
-
-        this.round = {
-            bids,
-            trump,
-            swaps,
-            plays,
-            hands,
-        };
     }
     reduceExpectedState() {
         // Determine if a player is sitting out due to a partner peppering
