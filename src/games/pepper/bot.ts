@@ -1,5 +1,4 @@
 import {
-    Hand,
     GameModel,
 } from './@types';
 import {
@@ -116,21 +115,21 @@ const sluff = (hand:number[], plays:number[], trump:number):number => {
     return groupedBySuits[suitWithLowestHigh].sort((c1, c2) => sortCardsByRank(c1, c2, trump))[groupedBySuits[suitWithLowestHigh].length - 1];
 };
 
-const swap = (hand:Hand, plays:number[], trump:number, swaps:number[]):number => {
+const swap = (hand:number[], plays:number[], trump:number, swaps:number[]):number => {
     if (swaps.length) {
         return sluff(hand, plays, trump);
     }
     return -1;
 };
 
-const bidWithTrump = (hand:Hand=[]):{bid:number, trump:number} => {
+const bidWithTrump = (hand:number[]=[]):{bid:number, trump:number} => {
     let noTrumpBid = 0;
     let maxTrumpBid = 0;
     let maxTrumpSuit = TRUMP_NONE;
     for(let suit = 0; suit < 4; suit++) {
-        const cardsOfSuitNoTrump = hand.filter(card => cardSuit(card, TRUMP_NONE) === suit);
+        const cardsOfSuitNoTrump = hand.filter((card:number) => cardSuit(card, TRUMP_NONE) === suit);
         noTrumpBid += noTrumpBidForSuit(cardsOfSuitNoTrump);
-        const cardsOfSuitTrump = hand.filter(card => cardSuit(card, suit) === suit);
+        const cardsOfSuitTrump = hand.filter((card:number) => cardSuit(card, suit) === suit);
         const bidTrump = trumpBidForSuit(cardsOfSuitTrump, suit);
         if (bidTrump > maxTrumpBid) {
             maxTrumpBid = bidTrump;
