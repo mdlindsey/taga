@@ -18,6 +18,7 @@ import {
     actionMap,
     suitMap,
     cardMap,
+    TRUMP_NONE,
     REQ_CARDS_PER_PLAYER,
 } from './config';
 import { ActionState, ActionInput } from './@types';
@@ -62,41 +63,54 @@ export const isBowerTrump = (card:number, trump:number):boolean => {
         (trump === SUIT_D && card === HJ)
     );
 };
-export const sortCardsByRank = (c1:number, c2:number, trump:number):number => { // pass to Array.sort()
-    const suit1 = cardSuit(c1, trump);
-    const suit2 = cardSuit(c2, trump);
-    if (trump < 0 || (suit1 !== trump && suit2 !== trump)) {
-        // no trump just raw value
-        if (suit1 !== suit2 || c1 < c2) {
-            // didn't follow suit or card1 is higher (numerically lower)
+
+export const sortTrick = (cards:number[], trump:number):number[] => {
+    const suitToFollow = cardSuit(cards[0], trump);
+    return cards.sort((c1, c2) => {
+        const s1 = cardSuit(c1, trump);
+        const s2 = cardSuit(c2, trump);
+        if (s1 === suitToFollow && s2 === suitToFollow) {
+            return compareSuitedCards(c1, c2, trump);
+        }
+        if (s1 === suitToFollow && s2 !== suitToFollow) {
             return -1;
         }
-        // if no condition above is true card2 must be higher
-        return 1;
-    }
-    // at this point we know we have at least one trump card
-    if (suit1 === trump && suit2 !== trump) {
+        if (s1 !== suitToFollow && s2 === suitToFollow) {
+            return 1;
+        }
+        // neither are the correct suit so it doesn't matter
         return -1;
+    });
+};
+export const sortSuitedCards = (suitedCars:number[], trump:number):number[] => {
+    return suitedCars.sort((c1, c2) => compareSuitedCards(c1, c2, trump));
+};
+export const compareSuitedCards = (c1:number, c2:number, trump:number):number => {
+    const s1 = cardSuit(c1, trump);
+    const s2 = cardSuit(c2, trump);
+    if (s1 !== s2) {
+        throw new Error('encountered unsuited cars in compareSuitedCards');
     }
-    if (suit1 !== trump && suit2 === trump) {
-        return 1;
+    // see if its the trump suit
+    if (s1 === trump) {
+        // both cards are trump, determine which is higher
+        if (isHighTrump(c1, trump)) {
+            return -1;
+        }
+        if (isHighTrump(c2, trump)) {
+            return 1;
+        }
+        if (isBowerTrump(c1, trump)) {
+            return -1;
+        }
+        if (isBowerTrump(c2, trump)) {
+            return 1;
+        }
     }
-    // both cards are trump, determine which is higher
-    if (isHighTrump(c1, trump)) {
-        return -1;
-    }
-    if (isHighTrump(c2, trump)) {
-        return 1;
-    }
-    if (isBowerTrump(c1, trump)) {
-        return -1;
-    }
-    if (isBowerTrump(c2, trump)) {
-        return 1;
-    }
-    // both are trump and neither are Jacks so it's numerical comparison
+    // no other conditions met so it's numerical comparison
     return c1 < c2 ? -1 : 1;
 };
+
 export const canFollowSuit = (suitToFollow:number, hand:number[], plays:number[], trump:number):boolean => {
     for(const card of hand) {
         if (!plays.includes(card) && cardSuit(card, trump) === suitToFollow) {
@@ -115,7 +129,16 @@ export const prevTrick = (bids:number[], plays:number[]):number[] => {
     return plays.slice(trickStartingIndex - totalActivePlayers(bids), trickStartingIndex + totalActivePlayers(bids));
 };
 
-export const lastTrickTaker = (bids:number[], plays:number[], trump:number, roundCount:number) => {
+export const cardOwner = (card:number, hands:number[][]):number => {
+    for(const playerIndex in hands) {
+        if (hands[playerIndex].includes(card)) {
+            return Number(playerIndex);
+        }
+    }
+    return -1;
+};
+
+export const trickTakers = (bids:number[], hands:number[][], plays:number[], trump:number):number[] => {
     // Group plays into tricks
     const tricks:number[][] = [];
     const playerCount = totalActivePlayers(bids);
@@ -130,25 +153,15 @@ export const lastTrickTaker = (bids:number[], plays:number[], trump:number, roun
     const takers:number[] = [];
     for(let i = 0; i < tricks.length; i++) {
         console.log(`[TT] Trick:`, tricks[i]);
-        const rankedTrick = tricks[i].sort((c1:number, c2:number) => sortCardsByRank(c1, c2, trump));
-        const highestCardIndex = tricks[i].indexOf(rankedTrick[0]);
-        console.log(`[TT] Trick:`, tricks[i]);
-        console.log(`[TT] High card index: ${highestCardIndex}`);
-        if (i > 0) {
-            // If it's not the first trick, the trick taker's index is lastTrickTakerIndex + highCardIndex
-            takers[i] = (takers[i-1] + highestCardIndex) % REQ_PLAYERS;
-            console.log(`[TT] Trick #${i+1} taken by #${takers[i]+1}`);
-            continue;
-        }
-        // If it's the first trick, the trick taker's index is bidderIndex + highCardIndex 
-        const firstBidderIndex = (roundCount - 1) % REQ_PLAYERS;
-        const highestBidderIndex = firstBidderIndex + bids.indexOf(Math.max(...bids));
-        takers[i] = highestBidderIndex + highestCardIndex;
-        console.log(`[TT] First trick! Taken by ${takers[i] + highestCardIndex + 1}`);
+        const rankedTrick = sortTrick(tricks[i], trump);
+        console.log('Ranked trick:', rankedTrick);
+        console.log('Highest card:', rankedTrick[0]);
+        takers[i] = cardOwner(rankedTrick[0], hands);
+        console.log('Card owner:', takers[i]);
     }
     // Determine who took the last trick
     console.log(`[TT][LT] Last trick taken by Player #${takers[takers.length-1]+1}`);
-    return takers[takers.length - 1];
+    return takers;
 };
 
 export const translateAction = (action:ActionState|ActionInput|any):string => {
@@ -197,7 +210,7 @@ export const sortCardsForHand = (cards:number[], trump:number):number[] => {
     }
     // Order suits highest to lowest
     for(const suit in suits) {
-        suits[suit] = suits[suit].sort((c1:number,c2:number) => sortCardsByRank(c1, c2, trump));
+        suits[suit] = sortSuitedCards(suits[suit], trump);
     }
     return [].concat.apply([], suits.sort((s1:number[], s2:number[]) => s2.length - s1.length));
 };

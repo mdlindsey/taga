@@ -27,7 +27,8 @@ import {
     canFollowSuit,
     activeTrick,
     totalActivePlayers,
-    lastTrickTaker,
+    trickTakers,
+    cardOwner,
 } from './util';
 import { act } from './bot';
 export class GameInstance implements GameModel {
@@ -96,7 +97,7 @@ export class GameInstance implements GameModel {
         // normalize and reduce state again
         this.denormalizeRounds();
         this.reduceExpectedState();
-        if (oldState.id === this.state.id && oldState.player === this.state.player) {
+        if (oldState.id === this.state.id && oldState.player === this.state.player && oldState.modifier === this.state.modifier) {
             throw new Error('stale state; please report');
         }
         // If everything looks good return the updated game state
@@ -212,12 +213,12 @@ export class GameInstance implements GameModel {
         if (this.round.plays.length % playerCount > 0) {
             // next player's turn to follow suit (if applicable)
             const trick = activeTrick(this.round.bids, this.round.plays);
-            const nextPlayerIndex = ( highestBidderIndex + this.round.plays.length ) % playerCount;
+            const nextPlayerIndex = ( cardOwner(trick[trick.length-1], this.round.hands) + 1 ) % playerCount;
             this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
         // Trick taker's turn to play any suit
-        const trickTakerIndex = lastTrickTaker(this.round.bids, this.round.plays, this.round.trump, this.data.length);
-        this.state = { id: ACTION_PLAY, player: trickTakerIndex, modifier: MOD_NA };
+        const takers = trickTakers(this.round.bids, this.round.hands, this.round.plays, this.round.trump);
+        this.state = { id: ACTION_PLAY, player: takers[takers.length-1], modifier: MOD_NA };
     }
 }
