@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Card, Hand } from '@taga/react';
+import { Card, Hand } from '../packages/react/src';
 
 export default {
   title: 'React.Cards',

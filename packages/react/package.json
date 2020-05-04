@@ -6,10 +6,6 @@
   "scripts": {
     "test": "jest"
   },
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "author": "Dan Lindsey",
   "license": "MIT",
   "dependencies": {

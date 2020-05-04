@@ -1,25 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import { CardWrapperProps, CardProps } from './@types';
 /*
     <Card />
     suit - letter of suit (eg: S)
     face - letter of face (eg: A, K, Q, 10=T)
     disabled - if truthy will dim the card and prevent uplift on hover for HandWrapper
 */
-export interface CardProps {
-    suit?: string
-    face?: string
-    disabled?: boolean
-    onClick?: CardCallback
-    onMouseOver?: CardCallback
-}
-export interface CardWrapperProps extends CardProps {
-    children?: any
-    className?: string
-    onClick?: (event:any) => void
-    onMouseOver?: (event:any) => void
-}
-export type CardCallback = (event?:any, card?:{suit:string, face:string}) => void;
 // Wrap the cards with the max dimensions of the smallest image (back.png)
 const CardWrapper:any = styled.span`
     img {
