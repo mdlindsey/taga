@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Card, { HandWrapper } from '../src/components/web/Card';
-import { hands } from '../__mocks__/pepper';
-import Pepper from '../src/games/pepper';
-import { deal } from '../src/games/pepper/util';
+import Pepper from '@taga/pepper';
+import { Card, Hand } from '@taga/react';
 
 export default {
   title: 'Integrations.React',
@@ -263,32 +261,32 @@ export const PepperTable = () => {
         }
       </CenterWrapper>
       <BottomHandWrapper>
-        <HandWrapper>
+        <Hand>
           {
             HandSorter(0)
           }
-        </HandWrapper>
+        </Hand>
       </BottomHandWrapper>
       <LeftHandWrapper>
-        <HandWrapper>
+        <Hand>
           {
             HandSorter(1)
           }
-        </HandWrapper>
+        </Hand>
       </LeftHandWrapper>
       <TopHandWrapper>
-        <HandWrapper>
+        <Hand>
           {
             HandSorter(2)
           }
-        </HandWrapper>
+        </Hand>
       </TopHandWrapper>
       <RightHandWrapper>
-        <HandWrapper>
+        <Hand>
           {
             HandSorter(3)
           }
-        </HandWrapper>
+        </Hand>
       </RightHandWrapper>
     </TableWrapper>
   );

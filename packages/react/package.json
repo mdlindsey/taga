@@ -1,0 +1,27 @@
+{
+  "name": "@taga/react",
+  "version": "1.0.0",
+  "description": "React components for the TagaJS library",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "author": "Dan Lindsey",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.8.6",
+    "styled-components": "^5.1.0"
+  },
+  "devDependencies": {
+    "@storybook/react": "^5.3.18",
+    "@types/react": "^16.9.0",
+    "@types/storybook__react": "^5.2.1",
+    "@types/styled-components": "^5.1.0",
+    "babel-preset-react-app": "^9.1.2",
+    "react-docgen-typescript-loader": "^3.7.2"
+  }
+}

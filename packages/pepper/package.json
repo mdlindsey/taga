@@ -1,0 +1,13 @@
+{
+  "name": "@taga/pepper",
+  "version": "1.0.0",
+  "description": "Pepper game engine and bot logic for the TagaJS library",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Dan Lindsey",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
