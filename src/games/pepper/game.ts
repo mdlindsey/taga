@@ -57,11 +57,6 @@ export class GameInstance implements GameModel {
             if (action.payload > MAX_BID) {
                 throw new Error(`bid (${action.payload}) exceeds max (${MAX_BID})`);
             }
-            // Testing without this - if we only take max bids does this matter?
-            // const highestBid = Math.max(...this.round.bids);
-            // if (action.payload <= highestBid && action.payload >= MIN_BID) {
-            //     throw new Error(`must pass (bid 0) or bid more than ${highestBid}`);
-            // }
         }
         if (action.id === ACTION_TRUMP) {
             // Ensure -1 <= trump =< 3

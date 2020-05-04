@@ -136,7 +136,7 @@ export const lastTrickTaker = (bids:number[], plays:number[], trump:number, roun
         console.log(`[TT] High card index: ${highestCardIndex}`);
         if (i > 0) {
             // If it's not the first trick, the trick taker's index is lastTrickTakerIndex + highCardIndex
-            takers[i] = takers[i-1] + highestCardIndex;
+            takers[i] = (takers[i-1] + highestCardIndex) % REQ_PLAYERS;
             console.log(`[TT] Trick #${i+1} taken by #${takers[i]+1}`);
             continue;
         }
