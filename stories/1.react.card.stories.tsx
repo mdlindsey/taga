@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card, { HandWrapper } from '../src/components/web/Card';
+import { Card, Hand } from '../packages/react/src';
 
 export default {
   title: 'React.Cards',
@@ -46,14 +46,14 @@ StyledCard.story = {
 
 export const DisabledCards = () => (
   <>
-      <HandWrapper>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
         <Card suit="S" face="J" disabled />
         <Card suit="S" face="T" />
         <Card suit="S" face="9" />
-      </HandWrapper>
+      </Hand>
   </>
 );
 
@@ -64,37 +64,37 @@ DisabledCards.story = {
 
 export const DynamicHands = () => (
   <>
-      <HandWrapper>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
         <Card suit="S" face="J" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
         <Card suit="S" face="J" />
         <Card suit="S" face="T" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
         <Card suit="S" face="J" />
         <Card suit="S" face="T" />
         <Card suit="S" face="9" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
@@ -102,8 +102,8 @@ export const DynamicHands = () => (
         <Card suit="S" face="T" />
         <Card suit="S" face="9" />
         <Card suit="S" face="8" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
@@ -112,8 +112,8 @@ export const DynamicHands = () => (
         <Card suit="S" face="9" />
         <Card suit="S" face="8" />
         <Card suit="S" face="7" />
-      </HandWrapper>
-      <HandWrapper>
+      </Hand>
+      <Hand>
         <Card suit="S" face="A" />
         <Card suit="S" face="K" />
         <Card suit="S" face="Q" />
@@ -127,7 +127,7 @@ export const DynamicHands = () => (
         <Card suit="S" face="4" />
         <Card suit="S" face="3" />
         <Card suit="S" face="2" />
-      </HandWrapper>
+      </Hand>
   </>
 );
 

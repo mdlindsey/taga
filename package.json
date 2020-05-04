@@ -1,19 +1,22 @@
 {
-  "name": "deckd",
-  "version": "0.0.1",
-  "description": "Library for all things related to card games including game engines, bots, React components, and more",
-  "main": "dist/deckd.min.js",
+  "name": "taga",
+  "description": "JS Library for all things related to table games including game engines, bots, components for React (+Native), and more",
   "author": {
     "name": "Dan Lindsey",
     "email": "dev@mdlindsey.com"
   },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
+    "bootstrap": "lerna bootstrap",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mdlindsey/deckd.git"
+    "url": "git+https://github.com/mdlindsey/taga.git"
   },
   "keywords": [
     "cards",
@@ -26,9 +29,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mdlindsey/deckd/issues"
+    "url": "https://github.com/mdlindsey/taga/issues"
   },
-  "homepage": "https://github.com/mdlindsey/deckd#readme",
+  "homepage": "https://github.com/mdlindsey/taga#readme",
   "peerDependencies": {
     "react": "^16.8.6"
   },
@@ -38,24 +41,14 @@
     "@storybook/addon-links": "^5.3.18",
     "@storybook/addons": "^5.3.18",
     "@storybook/preset-typescript": "^3.0.0",
-    "@storybook/react": "^5.3.18",
     "@types/jest": "^25.2.1",
     "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/storybook__react": "^5.2.1",
-    "@types/styled-components": "^5.1.0",
     "babel-loader": "^8.1.0",
-    "babel-preset-react-app": "^9.1.2",
     "jest": "^25.5.2",
     "lerna": "^3.20.2",
-    "react-docgen-typescript-loader": "^3.7.2",
+    "storybook": "^5.3.18",
     "ts-jest": "^25.4.0",
     "ts-loader": "^7.0.1",
     "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "react": "^16.8.6",
-    "react-markdown": "^4.3.1",
-    "styled-components": "^5.1.0"
   }
 }
