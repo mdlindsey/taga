@@ -58,7 +58,7 @@ Each game is installed as a standalone package including a deterministic state e
 
 #### Pepper
 
-`npm i @taga/pepper` or `yarn add @taga/pepper`
+Install via [`@taga/pepper`](https://www.npmjs.com/package/@taga/pepper)
 
 More examples available in [Storybook Demos](https://taga.appspot.com/storybook/pepper).
 
