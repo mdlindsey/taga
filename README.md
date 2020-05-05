@@ -15,17 +15,17 @@ React components fall into one of two categories, dynamic graphic rendering and 
 The `<Card />` component dynamically renders graphics for playing cards given the prop inputs.
 
 ```js
-    // Show back of card
-    <Card />
+// Show back of card
+<Card />
 
-    // Show Ace of Spades
-    <Card suit="S" face="A" />
+// Show Ace of Spades
+<Card suit="S" face="A" />
 
-    // Disabled card (dimmed out)
-    <Card suit="S" face="A" disabled />
+// Disabled card (dimmed out)
+<Card suit="S" face="A" disabled />
 
-    // Alert card details when clicked
-    <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
+// Alert card details when clicked
+<Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
 #### Hands
@@ -33,13 +33,13 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 The `<Hand />` HOC component wraps one or more `<Card />` components with dynamic styling to resemble how a player would hold a set of cards. Card position and rotation automagically adjust to the number of cards provided.
 
 ```js
-    <Hand>
-        <Card suit="S" face="A" />
-        <Card suit="S" face="K" />
-        <Card suit="S" face="Q" />
-        <Card suit="S" face="J" />
-        <Card suit="S" face="T" />
-    </Hand>
+<Hand>
+    <Card suit="S" face="A" />
+    <Card suit="S" face="K" />
+    <Card suit="S" face="Q" />
+    <Card suit="S" face="J" />
+    <Card suit="S" face="T" />
+</Hand>
 ```
 
 ### React Native Components
