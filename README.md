@@ -8,7 +8,7 @@ This library contains multiple packages that are installed independently of each
 
 ### React Components
 
-React components fall into one of two categories, dynamic graphic rendering and wrapper styling.
+React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install `@taga/react`.
 
 #### Cards
 
@@ -44,7 +44,15 @@ The `<Hand />` HOC component wraps one or more `<Card />` components with dynami
 
 ### React Native Components
 
-... coming soon
+Coming soon... To make these features available, install `@taga/react-native`.
+
+### Games
+
+Each game includes a deterministic state engine accompanied by a bot to suggest next moves or fill in for absent players.
+
+#### Pepper
+
+To make these features available, install `@taga/pepper`.
 
 ## Built With
 
