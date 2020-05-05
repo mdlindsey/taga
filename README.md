@@ -8,7 +8,9 @@ This library contains multiple packages that are installed independently of each
 
 ### React Components
 
-React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install [`@taga/react`](https://www.npmjs.com/package/@taga/react).
+Install via [`@taga/react`](https://www.npmjs.com/package/@taga/react)
+
+React components fall into one of two categories, dynamic graphic rendering and wrapper styling.
 
 #### Cards
 
@@ -48,7 +50,7 @@ More examples available in [Storybook Demos](https://taga.appspot.com/storybook/
 
 ### React Native Components
 
-`npm i @taga/react-native` or `yarn add @taga/react-native`
+Install via [`@taga/react-native`](https://www.npmjs.com/package/@taga/react-native)
 
 Coming soon...
 
