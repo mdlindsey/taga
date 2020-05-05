@@ -83,3 +83,4 @@ More examples available in [Storybook Demos](https://taga.appspot.com/storybook/
 * [Lerna](https://lerna.js.org/) - Monorepo package management
 * [Storybook](https://storybook.js.org/) - Unbeatable UI demos
 * [TypeScript](https://www.typescriptlang.org/) - Make JS scalable
+* [Google Cloud](https://cloud.google.com/) - App Engine & Cloud SQL
