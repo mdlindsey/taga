@@ -6,7 +6,7 @@ The OG library for all things related to table games including components for Re
 
 This library contains multiple packages that are installed independently of each other using the `@taga` scope.
 
-### React Components
+### [React Components](https://www.npmjs.com/package/@taga/react)
 
 React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install `@taga/react`.
 
@@ -29,8 +29,6 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 ```
 
 #### [Hands](https://taga.appspot.com/storybook/hands)
-
-[Storybook Demo](https://taga.appspot.com)
 
 The `<Hand />` HOC component wraps one or more `<Card />` components with dynamic styling to resemble how a player would hold a set of cards. Card position and rotation automagically adjust to the number of cards provided.
 
