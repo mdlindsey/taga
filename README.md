@@ -6,11 +6,11 @@ The OG library for all things related to table games including components for Re
 
 This library contains multiple packages that are installed independently of each other using the `@taga` scope.
 
-### [React Components](https://www.npmjs.com/package/@taga/react)
+### React Components
 
-React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install `@taga/react`.
+React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install [`@taga/react`](https://www.npmjs.com/package/@taga/react).
 
-#### [Cards](https://taga.appspot.com/storybook/cards)
+#### Cards
 
 The `<Card />` component dynamically renders graphics for playing cards given the prop inputs.
 
@@ -28,7 +28,9 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
-#### [Hands](https://taga.appspot.com/storybook/hands)
+Checkout the [Storybook Demos](https://taga.appspot.com/storybook/cards) for more examples.
+
+#### Hands
 
 The `<Hand />` HOC component wraps one or more `<Card />` components with dynamic styling to resemble how a player would hold a set of cards. Card position and rotation automagically adjust to the number of cards provided.
 
@@ -42,6 +44,8 @@ The `<Hand />` HOC component wraps one or more `<Card />` components with dynami
 </Hand>
 ```
 
+Checkout the [Storybook Demos](https://taga.appspot.com/storybook/hands) for more examples.
+
 ### React Native Components
 
 Coming soon... To make these features available, install `@taga/react-native`.
@@ -50,9 +54,11 @@ Coming soon... To make these features available, install `@taga/react-native`.
 
 Each game is installed as a standalone package including a deterministic state engine accompanied by a bot to suggest next moves or fill in for absent players.
 
-#### [Pepper](https://taga.appspot.com/storybook/pepper)
+#### Pepper
 
 To make these features available, install [`@taga/pepper`](https://www.npmjs.com/package/@taga/pepper).
+
+Checkout the [Storybook Demos](https://taga.appspot.com/storybook/pepper) for more examples.
 
 ## Built With
 
