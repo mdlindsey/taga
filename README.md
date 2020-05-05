@@ -48,11 +48,11 @@ Coming soon... To make these features available, install `@taga/react-native`.
 
 ### Games
 
-Each game includes a deterministic state engine accompanied by a bot to suggest next moves or fill in for absent players.
+Each game is installed as a standalone package including a deterministic state engine accompanied by a bot to suggest next moves or fill in for absent players.
 
 #### [Pepper](https://taga.appspot.com/storybook/pepper)
 
-To make these features available, install `@taga/pepper`.
+To make these features available, install [`@taga/pepper`](https://www.npmjs.com/package/@taga/pepper).
 
 ## Built With
 
