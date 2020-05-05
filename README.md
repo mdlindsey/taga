@@ -78,9 +78,9 @@ More examples available in [Storybook Demos](https://taga.appspot.com/storybook/
 
 ## Built With
 
-* [React](https://reactjs.org/) - Web component framework `@taga/react`
-* [React Native](https://reactnative.dev/) - Mobile component library `@taga/react-native`
+* [React](https://reactjs.org/) - Web component library
+* [React Native](https://reactnative.dev/) - Mobile component library
 * [Lerna](https://lerna.js.org/) - Monorepo package management
 * [Storybook](https://storybook.js.org/) - Unbeatable UI demos
-* [TypeScript](https://www.typescriptlang.org/) - Make JS scalable
+* [TypeScript](https://www.typescriptlang.org/) - Make JS scalable (seriously)
 * [Google Cloud](https://cloud.google.com/) - App Engine & Cloud SQL
