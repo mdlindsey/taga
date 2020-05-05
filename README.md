@@ -48,7 +48,9 @@ More examples available in [Storybook Demos](https://taga.appspot.com/storybook/
 
 ### React Native Components
 
-Coming soon... To make these features available, install `@taga/react-native`.
+`npm i @taga/react-native` or `yarn add @taga/react-native`
+
+Coming soon...
 
 ### Games
 
@@ -56,7 +58,7 @@ Each game is installed as a standalone package including a deterministic state e
 
 #### Pepper
 
-To make these features available, install [`@taga/pepper`](https://www.npmjs.com/package/@taga/pepper).
+`npm i @taga/pepper` or `yarn add @taga/pepper`
 
 More examples available in [Storybook Demos](https://taga.appspot.com/storybook/pepper).
 
