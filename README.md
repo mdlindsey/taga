@@ -1,6 +1,6 @@
 # TagaJS
 
-The OG library for all things related to table games including components for React (+Native), game engines, bots, and more. Checkout the [comprehensive storybook]() for use-cases and code examples.
+The OG library for all things related to table games including components for React (+Native), game engines, bots, and more. Checkout the [comprehensive storybook](https://taga.appspot.com) for use-cases and code examples.
 
 ## Getting Started
 
@@ -11,6 +11,8 @@ This library contains multiple packages that are installed independently of each
 React components fall into one of two categories, dynamic graphic rendering and wrapper styling. To make these features available, install `@taga/react`.
 
 #### Cards
+
+[Storybook Demo](https://taga.appspot.com)
 
 The `<Card />` component dynamically renders graphics for playing cards given the prop inputs.
 
@@ -29,6 +31,8 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 ```
 
 #### Hands
+
+[Storybook Demo](https://taga.appspot.com)
 
 The `<Hand />` HOC component wraps one or more `<Card />` components with dynamic styling to resemble how a player would hold a set of cards. Card position and rotation automagically adjust to the number of cards provided.
 
@@ -51,6 +55,8 @@ Coming soon... To make these features available, install `@taga/react-native`.
 Each game includes a deterministic state engine accompanied by a bot to suggest next moves or fill in for absent players.
 
 #### Pepper
+
+[Storybook Demo](https://taga.appspot.com)
 
 To make these features available, install `@taga/pepper`.
 
