@@ -3,7 +3,7 @@ import {
     HA, HK, HQ, HJ, HT, H9,
     CA, CK, CQ, CJ, CT, C9,
     DA, DK, DQ, DJ, DT, D9,
-} from '../src/games/pepper/config';
+} from '../packages/pepper/src/config';
 
 export const hands = {
     pepper: [
@@ -17,6 +17,12 @@ export const hands = {
         [HA, HK, HQ, HJ, HT, H9],
         [CA, CK, CQ, S9, CT, C9],
         [DA, DK, DQ, DJ, DT, D9],
+    ],
+    threeBid: [
+        [SA, SK, S9, HK, CK, DK],
+        [HA, HQ, SJ, HT, H9, ST],
+        [CA, CQ, HJ, CT, C9, DJ],
+        [DA, DQ, CJ, DT, D9, SQ],
     ],
     playerTwoPepper: [
         [SA, DK, CQ, SJ, DT, S9],

@@ -9,7 +9,7 @@ export default {
     Util,
     Config,
     GameInstance,
-    New: (roundData:[]) => {
+    New: (roundData:Types.RoundData[]=[]) => {
         const game = new GameInstance(roundData);
         return {
             game,

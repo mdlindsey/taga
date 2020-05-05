@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Game Engine Tests Instantiation 1`] = `
+Object {
+  "id": -1,
+  "modifier": -1,
+  "player": -1,
+}
+`;

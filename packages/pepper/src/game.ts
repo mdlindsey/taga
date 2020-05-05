@@ -23,6 +23,7 @@ import {
     REQ_CARDS_PER_PLAYER,
 } from './config';
 import {
+    deal,
     cardSuit,
     canFollowSuit,
     activeTrick,
@@ -30,7 +31,6 @@ import {
     trickTakers,
     cardOwner,
 } from './util';
-import { act } from './bot';
 export class GameInstance implements GameModel {
     public data:RoundData[];
     public state:ActionState;
@@ -38,18 +38,24 @@ export class GameInstance implements GameModel {
     public rounds:RoundModel[];
     constructor(rounds:RoundData[]) {
         this.data = rounds;
-        this.denormalizeRounds();
-        this.reduceExpectedState();
+        this.denormalize();
     }
     get round():RoundModel {
         return this.rounds[this.rounds.length-1];
     }
-    bot():number {
-        return act(this);
+    denormalize() {
+        this.denormalizeRounds();
+        this.reduceExpectedState();
+        this.reduceAdjustedScore();
     }
     interact(action:ActionInput):GameModel {
         if (action.id !== this.state.id) {
             throw new Error(`unexpected action[${action.id}]; expecting action[${this.state.id}]`);
+        }
+        if (action.id === ACTION_DEAL) {
+            this.data = [...this.data, { actions: [], hands: deal() }];
+            this.denormalize();
+            return this;
         }
         if (action.player !== this.state.player) {
             throw new Error(`unexpected player[${action.player}]; expecting player[${this.state.player}]`);
@@ -95,8 +101,7 @@ export class GameInstance implements GameModel {
         const oldState = {...this.state};
         this.data[this.data.length-1].actions.push({ id: action.id, payload: action.payload });
         // normalize and reduce state again
-        this.denormalizeRounds();
-        this.reduceExpectedState();
+        this.denormalize();
         if (oldState.id === this.state.id && oldState.player === this.state.player && oldState.modifier === this.state.modifier) {
             throw new Error('stale state; please report');
         }
@@ -181,7 +186,7 @@ export class GameInstance implements GameModel {
             this.state = { id: ACTION_BID, player: firstBidderIndex, modifier: MOD_NA };
             return;
         }
-        const highestBidderIndex = firstBidderIndex + this.round.bids.indexOf(highestBid);
+        const highestBidderIndex = (firstBidderIndex + this.round.bids.indexOf(highestBid)) % REQ_PLAYERS;
         if (this.round.trump === -2) {
             if (playerCount !== REQ_PLAYERS || this.round.bids.length >= REQ_PLAYERS) {
                 // Someone has peppered or everyone has bid, it's the highest bidder's turn to choose trump
@@ -213,12 +218,61 @@ export class GameInstance implements GameModel {
         if (this.round.plays.length % playerCount > 0) {
             // next player's turn to follow suit (if applicable)
             const trick = activeTrick(this.round.bids, this.round.plays);
-            const nextPlayerIndex = ( cardOwner(trick[trick.length-1], this.round.hands) + 1 ) % playerCount;
+            let nextPlayerIndex = ( cardOwner(trick[trick.length-1], this.round.hands) + 1 ) % playerCount;
+            if (highestBid === MAX_BID && nextPlayerIndex === highestBidderPartnerIndex) {
+                nextPlayerIndex++;
+            }
             this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
         // Trick taker's turn to play any suit
         const takers = trickTakers(this.round.bids, this.round.hands, this.round.plays, this.round.trump);
         this.state = { id: ACTION_PLAY, player: takers[takers.length-1], modifier: MOD_NA };
+    }
+    reduceAdjustedScore() {
+        this.score = {
+            tricks: [
+                0, // Player #1
+                0, // Player #2
+                0, // Player #3
+                0, // Player #4
+            ],
+            combined: [
+                0, // Player #1 + Player #3
+                0, // Player #2 + Player #4
+            ]
+        };
+        if (!this.data.length) {
+            return;
+        }
+        for(const roundIndex in this.rounds) {
+            const round = this.rounds[roundIndex];
+            if (round.plays.length < totalActivePlayers(round.bids)) {
+                continue;
+            }
+            // Get tricks taken per player
+            const tricksTaken = [0, 0, 0, 0];
+            trickTakers(round.bids, round.hands, round.plays, round.trump)
+                .forEach(player => { tricksTaken[player]++; this.score.tricks[player]++; });
+            if (round.plays.length < REQ_CARDS_PER_PLAYER * totalActivePlayers(round.bids)) {
+                continue;
+            }
+            // See if bid requirement was met
+            const highestBid = Math.max(...round.bids);
+            const firstBidderIndex = Number(roundIndex) % REQ_PLAYERS;
+            const highestBidderIndex = firstBidderIndex + round.bids.indexOf(highestBid);
+            const highestBidderPartnerIndex = (highestBidderIndex + 2) % REQ_PLAYERS;
+            const combinedTricks = tricksTaken[highestBidderIndex] + tricksTaken[highestBidderPartnerIndex];
+            const highestBiddingTeamIndex = !highestBidderIndex || highestBidderIndex === 2 ? 0 : 1;
+            // Failure to meet bid is penalty of bid (pepper x2)
+            const weightedAmount = highestBid === MAX_BID ? highestBid * 2 : highestBid;
+            if (combinedTricks < highestBid) {
+                this.score.combined[highestBiddingTeamIndex] -= weightedAmount;
+            } else {
+                this.score.combined[highestBiddingTeamIndex] += weightedAmount;
+            }
+            const otherTeamIndex = highestBiddingTeamIndex ? 0 : 1;
+            this.score.combined[otherTeamIndex] += tricksTaken.reduce((a,b) => a+b, 0) - combinedTricks;
+        }
     }
 }

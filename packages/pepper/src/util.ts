@@ -151,15 +151,10 @@ export const trickTakers = (bids:number[], hands:number[][], plays:number[], tru
     // Loop through tricks and determine who took each one
     const takers:number[] = [];
     for(let i = 0; i < tricks.length; i++) {
-        console.log(`[TT] Trick:`, tricks[i]);
         const rankedTrick = sortTrick(tricks[i], trump);
-        console.log('Ranked trick:', rankedTrick);
-        console.log('Highest card:', rankedTrick[0]);
         takers[i] = cardOwner(rankedTrick[0], hands);
-        console.log('Card owner:', takers[i]);
     }
     // Determine who took the last trick
-    console.log(`[TT][LT] Last trick taken by Player #${takers[takers.length-1]+1}`);
     return takers;
 };
 
