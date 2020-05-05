@@ -1,5 +1,5 @@
 import Pepper from '../src';
-import { hands } from '../../../__mocks__/pepper';
+import { hands } from './__mocks__/pepper';
 
 // ------------ Game Bot Tests ---------------- //
 

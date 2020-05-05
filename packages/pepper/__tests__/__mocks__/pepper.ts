@@ -3,7 +3,7 @@ import {
     HA, HK, HQ, HJ, HT, H9,
     CA, CK, CQ, CJ, CT, C9,
     DA, DK, DQ, DJ, DT, D9,
-} from '../packages/pepper/src/config';
+} from '../../src/config';
 
 export const hands = {
     pepper: [
