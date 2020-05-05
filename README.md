@@ -1,5 +1,12 @@
 # TegaJS
 
+The original JS library for all things related to table games including game engines, bots, components for React (+Native), and more.
+
+## Demo
+
+
+
+
 Round issues:
 - Everyone skipping doesn't reshuffle or stop at player #4
 - LastTrickTaker not logging on last trick of round (expected but need solution)

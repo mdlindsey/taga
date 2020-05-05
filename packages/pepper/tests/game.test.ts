@@ -1,5 +1,6 @@
 import Pepper from '../src';
 import { hands } from '../../../__mocks__/pepper';
+import { SWAP_REFUSE } from '../src/config';
 
 // ------------ Game Engine Tests ---------------- //
 
@@ -36,15 +37,70 @@ describe('Game Engine Tests', () => {
     expect(pepper.game.state.id).toBe(Pepper.Config.ACTION_DEAL);
   });
 
-  test('Interaction: Unexpected player', () => {
+  test('Interaction: Must follow suit', () => {
+    const pepper = Pepper.New([
+      {
+        hands: hands.threeBid,
+        actions: [
+          { id: Pepper.Config.ACTION_BID, payload: 3 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_TRUMP, payload: -1 },
+          { id: Pepper.Config.ACTION_PLAY, payload: Pepper.Config.SA },
+        ]
+      }
+    ]);
+    const mustFollowSuit = () => pepper.game.interact({ id: Pepper.Config.ACTION_PLAY, player: 1, payload: Pepper.Config.HA });
+    expect(mustFollowSuit).toThrow(Error);
+  });
+
+  test('Interaction: Excessive bid', () => {
     const pepper = Pepper.New([
       {
         hands: hands.pepper,
         actions: []
       }
     ]);
-    const unexpectedPlayer = () => pepper.game.interact({ id: Pepper.Config.ACTION_BID, player: 1, payload: 3 });
-    expect(unexpectedPlayer).toThrow(Error);
+    const excessiveBid = () => pepper.game.interact({ id: Pepper.Config.ACTION_BID, player: 0, payload: 99 });
+    expect(excessiveBid).toThrow(Error);
+  });
+
+  test('Interaction: Invalid trump suit', () => {
+    const pepper = Pepper.New([
+      {
+        hands: hands.pepper,
+        actions: [
+          { id: Pepper.Config.ACTION_BID, payload: 3 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+        ]
+      }
+    ]);
+    const invalidTrump = () => pepper.game.interact({ id: Pepper.Config.ACTION_TRUMP, player: 0, payload: 99 });
+    expect(invalidTrump).toThrow(Error);
+  });
+
+  test('Interaction: Invalid swap refusal', () => {
+    const pepper = Pepper.New([
+      {
+        hands: hands.pepper,
+        actions: [
+          { id: Pepper.Config.ACTION_BID, payload: 6 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_BID, payload: 0 },
+          { id: Pepper.Config.ACTION_TRUMP, payload: -1 },
+          { id: Pepper.Config.ACTION_SWAP, payload: 5 },
+        ]
+      }
+    ]);
+    const invalidSwapRefusal = () => pepper.game.interact({ id: Pepper.Config.ACTION_SWAP, player: 2, payload: SWAP_REFUSE });
+    expect(invalidSwapRefusal).toThrow(Error);
+
+    const unownedCard = () => pepper.game.interact({ id: Pepper.Config.ACTION_SWAP, player: 2, payload: 0 });
+    expect(unownedCard).toThrow(Error);
   });
 
   test('Interaction: Unexpected action', () => {
