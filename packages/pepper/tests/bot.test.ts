@@ -22,11 +22,13 @@ describe('Game Bot Tests', () => {
       }
     ]);
     expect(pepper.game.state.id).toBe(Pepper.Config.ACTION_BID);
-    let i = 0;
-    while(pepper.game.state.id !== Pepper.Config.ACTION_DEAL) {
+    while(Math.max(...pepper.game.score.combined) < 35) {
+      if (pepper.game.state.id === Pepper.Config.ACTION_DEAL) {
+        pepper.game.interact({ id: Pepper.Config.ACTION_DEAL, player: -1, payload: -1 });
+        continue;
+      }
       const action = { id: pepper.game.state.id, player: pepper.game.state.player, payload: pepper.bot() };
       pepper.game.interact(action);
-      console.log(`Bot performing move #${++i}: ${Pepper.Util.translateAction(action)}`)
     }
     expect(pepper.game.round.plays.length).toBe(Pepper.Config.REQ_PLAYERS * Pepper.Config.REQ_CARDS_PER_PLAYER);
   });

@@ -20,9 +20,9 @@ export const hands = {
     ],
     threeBid: [
         [SA, SK, S9, HK, CK, DK],
-        [HA, ST, HQ, HJ, HT, H9],
-        [CA, SJ, CQ, S9, CT, C9],
-        [DA, SQ, DQ, DJ, DT, D9],
+        [HA, HQ, SJ, HT, H9, ST],
+        [CA, CQ, HJ, CT, C9, DJ],
+        [DA, DQ, CJ, DT, D9, SQ],
     ],
     playerTwoPepper: [
         [SA, DK, CQ, SJ, DT, S9],

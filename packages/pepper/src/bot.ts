@@ -10,6 +10,8 @@ import {
     ACTION_TRUMP,
     ACTION_SWAP,
     ACTION_PLAY,
+    ACTION_DEAL,
+    MOD_NA,
 } from './config';
 import { activeTrick, cardSuit, sortSuitedCards, canFollowSuit, isHighTrump, isBowerTrump } from './util';
 
@@ -18,6 +20,8 @@ export const act = (game:GameModel):number => {
     const hand = hands[state.player];
     switch(game.state.id) {
         default:
+        case ACTION_DEAL:
+            return MOD_NA;
         case ACTION_BID:
             return bidWithTrump(hand).bid;
         case ACTION_TRUMP:

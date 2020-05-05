@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Pepper from '../packages/pepper/src';
 import { Card, Hand } from '../packages/react/src';
+import { hands } from '../__mocks__/pepper';
 
 export default {
   title: 'Integrations.React',
@@ -107,6 +108,21 @@ const FeedWrapper = styled.div`
   border: 1px solid black;
   background: rgba(255, 255, 255, 0.3);
 
+  .score {
+    padding: 6px;
+    font-family: sans-serif;
+    background: rgba(125, 255, 125, 0.3);
+    > * {
+      display: inline-block;
+      width: 50%;
+    }
+    :first-child {
+    }
+    :last-child {
+      text-align: right;
+    }
+  }
+
   pre {
     margin: 0;
     padding: 6px;
@@ -172,37 +188,25 @@ const TableWrapper = styled.div`
 `;
 
 export const PepperTable = () => {
-  const [game, setGame] = useState(new Pepper.GameInstance([]));
   const [moves, setMoves] = useState([]);
   const [trick, setTrick] = useState([]);
+  const [instance, setInstance] = useState(Pepper.New([
+    {
+      actions: [],
+      hands: hands.threeBid
+    }
+  ]));
   const [trickClass, setTrickClass] = useState('');
+
+  const { game } = instance;
   const nextMove = () => {
     try {
-      const nextAction = { id: game.state.id, player: game.state.player, payload: game.bot() };
+      const nextAction = { id: game.state.id, player: game.state.player, payload: instance.bot() };
       game.interact(nextAction);
-      setGame(new Pepper.GameInstance(game.data));
+      setInstance(Pepper.New(game.data));
       setMoves([...moves, nextAction]);
     } catch(e) {
       alert(e);
-    }
-  };
-  const normalizeTrick = (trick:number[]):{ index:number, card:number }[] => {
-    const norm = [];
-    for(const cardId of trick) {
-      for(const handIndex in game.round.hands) {
-        if (game.round.hands[handIndex].includes(cardId)) {
-          norm.push({ index: handIndex, card: cardId });
-        }
-      }
-    }
-    return norm;
-  };
-  const checkForNewRound = () => {
-    if (game.state.id === Pepper.Config.ACTION_DEAL) {
-      const rounds = [...game.data, { actions: [], hands: Pepper.Util.deal() }];
-      setTrick([]);
-      setTrickClass('');
-      setGame(new Pepper.GameInstance(rounds));
     }
   };
   const HandSorter = (playerIndex:number) => {
@@ -219,21 +223,30 @@ export const PepperTable = () => {
     setTrickClass('');
     const activeTrick = Pepper.Util.activeTrick(game.round.bids, game.round.plays);
     if (activeTrick.length) {
-      setTrick(normalizeTrick(activeTrick));
+      setTrick(activeTrick);
       return;
     }
     const prevTrick = Pepper.Util.prevTrick(game.round.bids, game.round.plays);
     if (prevTrick.length) {
-      setTrick(normalizeTrick(prevTrick));
-      setTrickClass(`slide-${game.state.player}`);
+      let trickDirection = game.state.player;
+      if (game.state.id === Pepper.Config.ACTION_DEAL) {
+        const trickTakers = Pepper.Util.trickTakers(game.round.bids, game.round.hands, game.round.plays, game.round.trump);
+        trickDirection = trickTakers[trickTakers.length - 1];
+        setTimeout(() => game.interact({ id: Pepper.Config.ACTION_DEAL, player: -1, payload: -1 }), 300);
+      }
+      setTrick(prevTrick);
       setTimeout(() => { setTrickClass(''); setTrick([]); }, 300);
+      setTrickClass(`slide-${trickDirection}`);
     }
-    checkForNewRound();
   }, [game]);
-  checkForNewRound();
+
   return (
     <TableWrapper className="table">
       <FeedWrapper>
+        <div className="score">
+          <div>Team #1: {game.score.combined[0]}</div>
+          <div>Team #2: {game.score.combined[1]}</div>
+        </div>
         <pre>
           Expecting { Pepper.Util.translateAction(game.state) }
         </pre>
@@ -247,15 +260,15 @@ export const PepperTable = () => {
           }
         </ul>
         <pre>
-          {Pepper.Util.translateAction({ id: game.state.id, player: game.state.player, payload: game.bot() })}
+          {Pepper.Util.translateAction({ id: game.state.id, player: game.state.player, payload: instance.bot() })}
         </pre>
         <button onClick={ () => nextMove() }>Accept</button>
       </FeedWrapper>
       <CenterWrapper className={trickClass}>
         {
-          trick.map(info => (
-            <div className={`index-${info.index}`} key={info.index}>
-              <Card suit={cardMap[info.card][0]} face={cardMap[info.card][1]} />
+          trick.map(card => (
+            <div className={`index-${Pepper.Util.cardOwner(card, game.round.hands)}`} key={`${cardMap[card][0]}-${cardMap[card][1]}`}>
+              <Card suit={cardMap[card][0]} face={cardMap[card][1]} />
             </div>
           ))
         }

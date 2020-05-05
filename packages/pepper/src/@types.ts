@@ -6,8 +6,10 @@ export interface GameModel {
     readonly score: ScoreModel
     readonly rounds: RoundModel[]
     interact(action: ActionInput): GameModel // Exposed publicly
+    denormalize(): void // calls everything below
     denormalizeRounds(): void // Populates this.round
     reduceExpectedState(): void // Populates this.state
+    reduceAdjustedScore(): void // Populates this.score
 }
 // ActionState dictates next move expectations
 export interface ActionState {
@@ -31,7 +33,10 @@ export interface ActionData {
     payload: number
 }
 // Modeling
-export type ScoreModel = { tricks: number, score: number }[];
+export type ScoreModel = {
+    tricks: number[],
+    combined: number[]
+};
 export interface RoundModel {
     bids: number[]
     swaps: number[]
