@@ -1,14 +1,14 @@
-# TegaJS
+# TagaJS
 
-The original JS library for all things related to table games including game engines, bots, components for React (+Native), and more. Checkout the [comprehensive storybook]() for use-cases and code examples.
+The OG library for all things related to table games including components for React (+Native), game engines, bots, and more. Checkout the [comprehensive storybook]() for use-cases and code examples.
 
 ## Getting Started
 
-This library contains component libraries in addition to numerous game engines and bot services that are installed independently of each other using the `@taga` scope.
+This library contains multiple packages that are installed independently of each other using the `@taga` scope.
 
 ### React Components
 
-Components fall into one of two categories, dynamic graphic rendering and wrapper styling.
+React components fall into one of two categories, dynamic graphic rendering and wrapper styling.
 
 #### Cards
 
@@ -28,9 +28,23 @@ The `<Card />` component dynamically renders graphics for playing cards given th
     <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
+#### Hands
+
+The `<Hand />` HOC component wraps one or more `<Card />` components with dynamic styling to resemble how a player would hold a set of cards. Card position and rotation automagically adjust to the number of cards provided.
+
+```js
+    <Hand>
+        <Card suit="S" face="A" />
+        <Card suit="S" face="K" />
+        <Card suit="S" face="Q" />
+        <Card suit="S" face="J" />
+        <Card suit="S" face="T" />
+    </Hand>
+```
+
 ### React Native Components
 
-
+... coming soon
 
 ## Built With
 
