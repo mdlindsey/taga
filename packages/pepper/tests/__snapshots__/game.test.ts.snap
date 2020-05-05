@@ -7,3 +7,19 @@ Object {
   "player": -1,
 }
 `;
+
+exports[`Game Engine Snapshot Tests Instantiation 1`] = `
+Object {
+  "id": -1,
+  "modifier": -1,
+  "player": -1,
+}
+`;
+
+exports[`Game Engine Tests Instantiation 1`] = `
+Object {
+  "id": -1,
+  "modifier": -1,
+  "player": -1,
+}
+`;

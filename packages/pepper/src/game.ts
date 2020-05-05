@@ -30,7 +30,6 @@ import {
     trickTakers,
     cardOwner,
 } from './util';
-import { act } from './bot';
 export class GameInstance implements GameModel {
     public data:RoundData[];
     public state:ActionState;
@@ -43,9 +42,6 @@ export class GameInstance implements GameModel {
     }
     get round():RoundModel {
         return this.rounds[this.rounds.length-1];
-    }
-    bot():number {
-        return act(this);
     }
     interact(action:ActionInput):GameModel {
         if (action.id !== this.state.id) {
@@ -213,7 +209,10 @@ export class GameInstance implements GameModel {
         if (this.round.plays.length % playerCount > 0) {
             // next player's turn to follow suit (if applicable)
             const trick = activeTrick(this.round.bids, this.round.plays);
-            const nextPlayerIndex = ( cardOwner(trick[trick.length-1], this.round.hands) + 1 ) % playerCount;
+            let nextPlayerIndex = ( cardOwner(trick[trick.length-1], this.round.hands) + 1 ) % playerCount;
+            if (highestBid === MAX_BID && nextPlayerIndex === highestBidderPartnerIndex) {
+                nextPlayerIndex++;
+            }
             this.state = { id: ACTION_PLAY, player: nextPlayerIndex, modifier: cardSuit(trick[0], this.round.trump) };
             return;
         }
