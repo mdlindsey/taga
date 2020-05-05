@@ -28,7 +28,7 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
-Checkout the [Storybook Demos](https://taga.appspot.com/storybook/cards) for more examples.
+More examples available in [Storybook Demos](https://taga.appspot.com/storybook/cards).
 
 #### Hands
 
@@ -44,7 +44,7 @@ The `<Hand />` HOC component wraps one or more `<Card />` components with dynami
 </Hand>
 ```
 
-Checkout the [Storybook Demos](https://taga.appspot.com/storybook/hands) for more examples.
+More examples available in [Storybook Demos](https://taga.appspot.com/storybook/hands).
 
 ### React Native Components
 
@@ -58,7 +58,7 @@ Each game is installed as a standalone package including a deterministic state e
 
 To make these features available, install [`@taga/pepper`](https://www.npmjs.com/package/@taga/pepper).
 
-Checkout the [Storybook Demos](https://taga.appspot.com/storybook/pepper) for more examples.
+More examples available in [Storybook Demos](https://taga.appspot.com/storybook/pepper).
 
 ## Built With
 
