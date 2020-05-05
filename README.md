@@ -23,13 +23,22 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 
     // Disabled card (dimmed out)
     <Card suit="S" face="A" disabled />
-    
+
     // Alert card details when clicked
     <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
 ### React Native Components
 
+
+
+## Built With
+
+* [React](https://reactjs.org/) - Web component framework `@taga/react`
+* [React Native](https://reactnative.dev/) - Mobile component library `@taga/react-native`
+* [Lerna](https://lerna.js.org/) - Monorepo package management
+* [Storybook](https://storybook.js.org/) - Unbeatable UI demos
+* [TypeScript](https://www.typescriptlang.org/) - Make JS scalable
 
 
 
