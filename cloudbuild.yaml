@@ -11,4 +11,4 @@ steps:
     - name: node:10.15.1
       args: ['./build']
     - name: gcloud
-      args: ['app', 'deploy']
+      args: ['app', 'deploy', './storybook-static']
