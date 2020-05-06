@@ -147,7 +147,7 @@ export const trickTakers = (bids:number[], hands:number[][], plays:number[], tru
             tricks[trickIndex] = [];
         }
         tricks[trickIndex].push(plays[i]);
-    }
+    } // probably have a bug with tricktaker being -1 from no owner
     // Loop through tricks and determine who took each one
     const takers:number[] = [];
     for(let i = 0; i < tricks.length; i++) {
