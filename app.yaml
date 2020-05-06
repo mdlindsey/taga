@@ -1,6 +1,1 @@
-handlers:
-    - url: /favicon\.ico
-      static_files: favicon.ico
-      upload: favicon\.ico
-    - url: /bootstrap
-      static_dir: bootstrap
+runtime: nodejs10
