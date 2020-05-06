@@ -12,7 +12,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "storybook": "start-storybook -p 6006",
-    "storybook:build": "build-storybook",
+    "storybook:build": "build-storybook && node build",
     "test": "jest --clearCache && jest --verbose --coverage",
     "test:update": "npm test -- -u",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
