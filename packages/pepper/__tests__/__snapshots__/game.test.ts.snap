@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Game Engine Snapshot Tests Denormalization 1`] = `Object {}`;
-
 exports[`Game Engine Tests Instantiation 1`] = `
 Object {
   "id": -1,

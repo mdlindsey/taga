@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Pepper from '../packages/pepper/src';
 import { Card, Hand } from '../packages/react/src';
-import { hands } from '../__mocks__/pepper';
+import { hands } from '../packages/pepper/__tests__/__mocks__/pepper';
 
 export default {
   title: 'Integrations.React',
