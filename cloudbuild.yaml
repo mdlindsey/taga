@@ -8,8 +8,7 @@ steps:
     - name: node:10.15.1
       entrypoint: yarn
       args: ['storybook:build']
-    - name: node:10.15.1
-      entrypoint: node
+    - name: gcr.io/cloud-builders/node
       args: ['./build']
     - name: gcloud
       args: ['app', 'deploy', './storybook-static']
