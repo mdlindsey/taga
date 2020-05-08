@@ -10,6 +10,7 @@
     "packages/*"
   ],
   "scripts": {
+    "gcp:build": "node ./build",
     "bootstrap": "lerna bootstrap",
     "storybook": "start-storybook -p 6006",
     "storybook:build": "build-storybook && node build",
