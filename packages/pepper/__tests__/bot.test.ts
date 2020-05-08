@@ -31,6 +31,9 @@ describe('Game Bot Tests', () => {
       const action = { id: pepper.game.state.id, player: pepper.game.state.player, payload: pepper.bot() };
       pepper.game.interact(action);
     }
-    expect(pepper.game.round.plays.length).toBe(Pepper.Config.REQ_PLAYERS * Pepper.Config.REQ_CARDS_PER_PLAYER);
+    expect(pepper.game.round.plays.length)
+      .toBe(
+        Pepper.Util.totalActivePlayers(pepper.game.round.bids) * Pepper.Config.REQ_CARDS_PER_PLAYER
+      );
   });
 });
