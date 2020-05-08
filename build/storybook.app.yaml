@@ -2,7 +2,4 @@ runtime: nodejs10
 service: storybook
 handlers:
   - url: /
-    static_files: index.html
-    upload: index.html
-  - url: /
     static_dir: /
