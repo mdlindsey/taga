@@ -13,7 +13,7 @@
     "gcp:build": "node ./build",
     "bootstrap": "lerna bootstrap",
     "storybook": "start-storybook -p 6006",
-    "storybook:build": "build-storybook && node build",
+    "storybook:build": "build-storybook",
     "test": "jest --clearCache && jest --verbose --coverage",
     "test:update": "npm test -- -u",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",

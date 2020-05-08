@@ -1,8 +1,12 @@
 runtime: nodejs10
 service: storybook
+threadsafe: true
+
 handlers:
-  - url: /index.html
-    static_files: index.html
-    upload: index.html
-  - url: /
-    static_dir: /
+- url: /
+  static_files: www/index.html
+  upload: www/index.html
+
+- url: /(.*)
+  static_files: www/\1
+  upload: www/(.*)
