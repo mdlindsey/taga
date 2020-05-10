@@ -5,6 +5,7 @@ The OG library for all things related to table games including components for Re
 ## Issues
 
 - [x] Fix TrickTaker logic
+- [X] Score becomes NaN after few rounds
 - [ ] PlayerID out of bounds (>=4) after all skip bids
 - [ ] Implement scoring model (will also fix last trick taker of round issue)
 - [ ] Ensure shortest sluff suit isn't highest card of suit (eg: only Spade is SA)
@@ -42,7 +43,7 @@ The `<Card />` component dynamically renders graphics for playing cards given th
 <Card suit="S" face="A" onClick={ card => alert(`You clicked ${card.suit}${card.face}`) } />
 ```
 
-More examples available in [Storybook Demos](https://taga.appspot.com/storybook/cards).
+More examples available in [Storybook Demos](https://storybook-dot-tagajs.ue.r.appspot.com/?path=/story/react-cards).
 
 #### Hands
 
@@ -58,7 +59,7 @@ The `<Hand />` HOC component wraps one or more `<Card />` components with dynami
 </Hand>
 ```
 
-More examples available in [Storybook Demos](https://taga.appspot.com/storybook/hands).
+More examples available in [Storybook Demos](https://storybook-dot-tagajs.ue.r.appspot.com/?path=/story/react-cards--dynamic-hands).
 
 ### React Native Components
 

@@ -265,7 +265,7 @@ export class GameInstance implements GameModel {
             const combinedTricks = tricksTaken[highestBidderIndex] + tricksTaken[highestBidderPartnerIndex];
             const highestBiddingTeamIndex = !highestBidderIndex || highestBidderIndex === 2 ? 0 : 1;
             // Failure to meet bid is penalty of bid (pepper x2)
-            const weightedAmount = highestBid === MAX_BID ? highestBid * 2 : highestBid;
+            const weightedAmount = highestBid === MAX_BID ? highestBid * 2 : combinedTricks;
             if (combinedTricks < highestBid) {
                 this.score.combined[highestBiddingTeamIndex] -= weightedAmount;
             } else {
